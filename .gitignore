@@ -36,6 +36,10 @@ build/Release
 node_modules/
 jspm_packages/
 
+# dist directories
+dist/
+dist_electron/
+
 # TypeScript v1 declaration files
 typings/
 
