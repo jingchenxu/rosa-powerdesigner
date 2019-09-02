@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Menu @on-select="handleSelect" @on-open-change="handleOpenChange" theme="dark" active-name="1-2" :open-names="['1']">
+    <Menu width="auto" @on-select="handleSelect" @on-open-change="handleOpenChange" theme="dark" active-name="1-2" :open-names="['1']">
       <Submenu :key="dbindex" v-for="(db, dbindex) of menu" :name="db.code">
         <template slot="title">
           <Icon type="ios-cog" />

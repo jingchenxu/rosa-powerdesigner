@@ -226,6 +226,204 @@ class CodeGenerator {
     return file
   }
 
+  genJavaClass () {
+    // TODO 需要制定package的位置
+    let className = ''
+    this.table.tablecode.split('_').forEach((element, index) => {
+      if (index > 0) {
+        className = className + element
+      }
+    })
+    let code = ''
+    let codeStart = `public class ${className} implements BaseBean {\n\r`
+    let codeEnd = '\n}'
+    let codeItems = ''
+    let codeRules = ''
+    let codeDebug = ''
+    let debugString = ''
+    let classInit = `    @Override\n    public void OnInit() {\n`
+    let classGetAndSet = ''
+    for (let column of this.codeConfig) {
+      let _columnid = column.columnid.toLowerCase()
+      debugString = `${debugString}"${column.columnname}:${_columnid}", `
+      switch (column.datatype) {
+        case 'varchar':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private String ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = "";\n`
+          classGetAndSet = `${classGetAndSet}    public String get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(String ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'nvarchar':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private String ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = "";\n`
+          classGetAndSet = `${classGetAndSet}    public String get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(String ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'smallint':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private int ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = 0;\n`
+          classGetAndSet = `${classGetAndSet}    public int get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(int ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'int':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private int ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = 0;\n`
+          classGetAndSet = `${classGetAndSet}    public int get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(int ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'date':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private Date ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = DateUtils.GetMinDate();\n`
+          classGetAndSet = `${classGetAndSet}    public java.util.Date get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(java.util.Date ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'datetime':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private Date ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = DateUtils.GetMinDate();\n`
+          classGetAndSet = `${classGetAndSet}    public java.util.Date get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(java.util.Date ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        case 'bit':
+          codeItems = `${codeItems}    // ${column.columnname}\n    private boolean ${_columnid};\n`
+          classInit = `${classInit}        this.${_columnid} = false;\n`
+          classGetAndSet = `${classGetAndSet}    public boolean get${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}() {\n        return ${_columnid};\n    }\n\r`
+          classGetAndSet = `${classGetAndSet}    public void set${_columnid.charAt(0).toUpperCase()}${_columnid.slice(1)}(boolean ${_columnid}) {\n        this.${_columnid} = ${_columnid};\n    }\n\r`
+          break
+        default:
+          console.log(`${column.datatype}未匹配到合适的数据类型`)
+      }
+    }
+    // 针对deal进行处理
+    codeItems = `${codeItems}    \r    @JsonIgnore\n    private DataDeal<${className}> deal;\n\r`
+    // 生成构造函数
+    codeItems = `${codeItems}    public ${className} {\n       this.OnInit();\n    }\r`
+    // TODO 生成表单校验
+    // 生成调试信息
+    codeDebug = `${codeDebug}    \r    @Override\n    public String OnDebug() {\n        return TranUtils.DebugProperty(this, this.OnProperties());\n    }\n\r`
+    codeDebug = `${codeDebug}    @Override\n    public String OnCompare() {\n        return TranUtils.CompareProperty((${className})item, this, this.OnProperties());\n    }\n\r`
+    codeDebug = `${codeDebug}    @Override\n    public String[] OnProperties() {\n        return new String[] {${debugString}};\n    }\n\r`
+    // TODO 生成exclusiongs
+    codeDebug = `${codeDebug}    @Override\n    public String[] OnExclusions() {\n        return new String[] { "deal" };\n    }\n\r`
+    // 构造函数调用的初始化函数
+    classInit = `${classInit}    }\n\r`
+    // 生成setter and getter
+    classGetAndSet = `${classGetAndSet}    public DataDeal<${className} getDeal() {\n        if (deal == null)\n            deal = new DataDeal<${className}>();\n        return deal;\n    }\n\r`
+    classGetAndSet = `${classGetAndSet}    public void setDeal(DataDeal<${className}> deal) {\n        this.deal = deal;\n    }\n\r`
+    code = codeStart + codeItems + codeDebug + classInit + classGetAndSet + codeEnd
+    let file = {
+      code,
+      fileName: className,
+      fileType: 'java'
+    }
+    return file
+  }
+
+  genSearchSql () {
+    let procedure = ''
+    let code = ''
+    let tableName = this.table.tablecode.toLowerCase()
+    this.table.tablecode.split('_').forEach((element, index) => {
+      if (index > 0) {
+        procedure = procedure + element
+      }
+    })
+    let countSql = `'select @TOTAL = count(*) from '
+    + '${tableName} a '
+    + 'where 1=1 '
+`
+    let searchSql = `'select * from (select a.*, '
+    + 'row_number() over (order by a.coid) as RN from '
+    + '${tableName} a '
+    + 'where 1=1 '
+
+`
+    procedure = `P_Search_${procedure}`
+    code = `${code}if (exists (select name from sysobjects where (name = N'${procedure}') and (type = 'P')))\n  drop procedure dbo.${procedure}\ngo\n\r`
+    code = `${code}create procedure [abo].${procedure}\n(\n  @search varchar(4000) = null,\n  @start int = null,\n  @end int = null,\n  @total int = null out,\n  @getaction varchar(10) = null\n)\nas\n`
+    code = `${code}begin\n  if (@start is not null) and (@end is not null)\n  begin\n    declare @sql nvarchar(4000)\n\r    set @sql = ${countSql}\n\r`
+    code = `${code}    if (isnull(@search, '') != '')\n     set @sql = @sql + ' and ' +  @search\n\r`
+    code = `${code}    exec sp_executesql @sql, N'@TOTAL int out', @total out\n\r`
+    code = `${code}    set @sql = ${searchSql}\n\r`
+    code = `${code}    if (isnull(@search, '') != '')\n      set @sql = @sql + ' and ' +  @search\n\r`
+    code = `${code}    set @sql = @sql + ' ) SearchList where RN between ' + ltrim(str(@start)) + ' and ' + ltrim(str(@end))\n\r`
+    code = `${code}    exec(@sql)\n  end\nend\n\rgo`
+    let file = {
+      code,
+      fileName: procedure,
+      fileType: 'sql'
+    }
+    return file
+  }
+
+  genGetSql () {
+    let procedure = ''
+    let code = ''
+    let tableName = this.table.tablecode.toLowerCase()
+    this.table.tablecode.split('_').forEach((element, index) => {
+      if (index > 0) {
+        procedure = procedure + element
+      }
+    })
+    let getSql = `select a.* from ${tableName} a where a.coid = @coid`
+    procedure = `P_Get_${procedure}`
+    code = `${code}if (exists (select name from sysobjects where (name = N'${procedure}') and (type = 'P')))\n  drop procedure dbo.${procedure}\ngo\n\r`
+    code = `${code}create procedure [abo].${procedure}\n(\n  @coid varchar(4)\n)\nas\n`
+    code = `${code}begin\n   ${getSql}\nend\n\rgo`
+    let file = {
+      code,
+      fileName: procedure,
+      fileType: 'sql'
+    }
+    return file
+  }
+
+  genSaveSql () {
+    let procedure = ''
+    let code = ''
+    let codeParams = ''
+    let insertSql = ''
+    let insertSqlKey = ''
+    let insertSqlValue = ''
+    let updateSql = ''
+    let tableName = this.table.tablecode.toLowerCase()
+    this.table.tablecode.split('_').forEach((element, index) => {
+      if (index > 0) {
+        procedure = procedure + element
+      }
+    })
+    for (let column of this.codeConfig) {
+      console.dir(column)
+      let _columnid = column.columnid.toLowerCase()
+      let length = column.length
+      let datatype = column.datatype
+      if (length) {
+        codeParams = `${codeParams}  @${_columnid} ${datatype}(${length}) = null,\n`
+      } else {
+        codeParams = `${codeParams}  @${_columnid} ${datatype} = null,\n`
+      }
+      insertSqlKey = `${insertSqlKey}${_columnid}, `
+      insertSqlValue = `${insertSqlValue}@${_columnid}, `
+      updateSql = `${updateSql}    ${_columnid} = @${_columnid},\n`
+    }
+    insertSql = `insert into ${tableName}(${insertSqlKey}) values (${insertSqlValue})`
+    updateSql = `update ${tableName} set\n${updateSql}   where coid = @coid\n  end\nend\ngo`
+    codeParams = `${codeParams}  @action int\n`
+    // TODO 存储过程接收的参数
+    // TODO 存储过程新增语句
+    // TODO 存储过程更新语句
+    procedure = `P_Save_${procedure}`
+    code = `${code}if (exists (select name from sysobjects where (name = N'${procedure}') and (type = 'P')))\n  drop procedure dbo.${procedure}\ngo\n\r`
+    code = `${code}create procedure [dbo].${procedure}\n(\n${codeParams})\nas\nbegin\n  set nocount on\n\r`
+    code = `${code}  if @action = 2\n  begin\n    ${insertSql}\n  end`
+    code = `${code}  else if @action = 3\n  begin\n   ${updateSql}`
+    let file = {
+      code,
+      fileName: procedure,
+      fileType: 'sql'
+    }
+    return file
+  }
+
   genFormPreview () {
     let code = ''
     let codestart = '  <Form :label-width="140" class="formDetail">\n' +

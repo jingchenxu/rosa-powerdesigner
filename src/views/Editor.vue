@@ -11,6 +11,8 @@ import 'codemirror/lib/codemirror.css'
 
 import CodeMirror from 'codemirror/lib/codemirror'
 import 'codemirror/mode/vue/vue'
+import 'codemirror/mode/clike/clike'
+import 'codemirror/mode/sql/sql'
 
 import { mapGetters } from 'vuex'
 
@@ -42,10 +44,13 @@ export default {
   },
   mounted () {
     this.initEditor()
-    let codeMirror = document.getElementsByClassName('CodeMirror')
-    codeMirror[0].style.height = (document.body.clientHeight - 86) + 'px'
+    this.resizeEditor()
   },
   methods: {
+    resizeEditor () {
+      let codeMirror = document.getElementsByClassName('CodeMirror')
+      codeMirror[0].style.height = (document.body.clientHeight - 86) + 'px'
+    },
     initEditor () {
       // 初始化代码编辑器
       let mime = 'text/javascript'
@@ -112,6 +117,50 @@ export default {
       this.fileName = file.fileName
       // TODO 需要添加编辑器对vue的支持
       this.editor.setOption('mode', 'text/x-vue')
+      // this.code = beautify_js(this.code, jdFormatConfig)
+      this.editor.setValue(this.code)
+    },
+    genJavaClass (formConfig) {
+      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
+      let file = codeGenerator.genJavaClass(formConfig)
+      this.code = file.code
+      this.fileType = file.fileType
+      this.fileName = file.fileName
+      // TODO 需要添加编辑器对vue的支持
+      this.editor.setOption('mode', 'text/x-java')
+      // this.code = beautify_js(this.code, jdFormatConfig)
+      this.editor.setValue(this.code)
+    },
+    genSearchSql (formConfig) {
+      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
+      let file = codeGenerator.genSearchSql(formConfig)
+      this.code = file.code
+      this.fileType = file.fileType
+      this.fileName = file.fileName
+      // TODO 需要添加编辑器对vue的支持
+      this.editor.setOption('mode', 'text/x-sql')
+      // this.code = beautify_js(this.code, jdFormatConfig)
+      this.editor.setValue(this.code)
+    },
+    genGetSql (formConfig) {
+      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
+      let file = codeGenerator.genGetSql(formConfig)
+      this.code = file.code
+      this.fileType = file.fileType
+      this.fileName = file.fileName
+      // TODO 需要添加编辑器对vue的支持
+      this.editor.setOption('mode', 'text/x-sql')
+      // this.code = beautify_js(this.code, jdFormatConfig)
+      this.editor.setValue(this.code)
+    },
+    genSaveSql (formConfig) {
+      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
+      let file = codeGenerator.genSaveSql(formConfig)
+      this.code = file.code
+      this.fileType = file.fileType
+      this.fileName = file.fileName
+      // TODO 需要添加编辑器对vue的支持
+      this.editor.setOption('mode', 'text/x-sql')
       // this.code = beautify_js(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
     },

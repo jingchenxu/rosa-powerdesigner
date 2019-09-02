@@ -5,12 +5,18 @@
         <Navigator />
       </Header>
       <Layout>
-        <Sider :style="{height: siderHeihgt+'px'}">
-          <table-menu :menu="getDBList" />
-        </Sider>
-        <Content :style="{height: siderHeihgt+'px'}">
-          <router-view ref="page" />
-        </Content>
+        <Split ref="split" :min="0.25" :max="0.5" v-model="split">
+          <div slot="left">
+            <Sider :width="siderWidth" :style="{height: siderHeihgt+'px'}">
+              <table-menu :menu="getDBList" />
+            </Sider>
+          </div>
+          <div slot="right">
+            <Content :style="{height: siderHeihgt+'px'}">
+              <router-view ref="page" />
+            </Content>
+          </div>
+        </Split>
       </Layout>
       <Footer>
         <Row>
@@ -101,11 +107,8 @@
         </TabPane>
       </Tabs>
     </Modal>
-    <Modal
-      :width="800"
-      v-model="showTableSetting"
-      title="代码生成设置">
-      <table-setting/>
+    <Modal :width="800" v-model="showTableSetting" title="代码生成设置">
+      <table-setting />
     </Modal>
   </div>
 </template>
@@ -120,7 +123,10 @@ const { ipcRenderer } = window.require('electron')
 export default {
   name: 'App',
   computed: {
-    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable'])
+    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable']),
+    siderWidth () {
+      return document.body.clientWidth * this.split
+    }
   },
   components: {
     Navigator,
@@ -133,7 +139,8 @@ export default {
       showSetting: false,
       formValidate: {},
       ruleValidate: {},
-      showTableSetting: false
+      showTableSetting: false,
+      split: 0.3
     }
   },
   beforeCreate () {
@@ -141,8 +148,13 @@ export default {
   },
   mounted () {
     window.addEventListener('resize', () => {
-      console.log('resize', document.body.clientHeight - 86)
       this.siderHeihgt = document.body.clientHeight - 86
+      // 更新编辑器尺寸
+      if (this.$refs.page.resizeEditor) {
+        this.$refs.page.resizeEditor()
+      }
+      // 更新split样式
+      this.$refs.split.computeOffset()
     })
     ipcRenderer.on('update-dbmap', (event, key, dbList) => {
       this.$store.dispatch('UPDATEDBMAP', { key, dbList })
@@ -184,8 +196,9 @@ body {
       padding: 0;
     }
     .ivu-layout-sider {
-      min-width: 240px !important;
-      max-width: 240px !important;
+      // min-width: 240px !important;
+      // max-width: 240px !important;
+      width: 100%;
       overflow-y: scroll;
     }
     .ivu-layout-footer {
