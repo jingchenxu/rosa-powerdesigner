@@ -33,6 +33,7 @@
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
+    <Button @click="handleCopy" type="primary">复制到粘贴板</Button>
     <Button @click="handleExport" type="primary">导出代码</Button>
     <Button @click="handlePreview" type="primary">预览表单页</Button>
     <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input>
@@ -41,7 +42,9 @@
 
 <script>
 import FormConfig from './FormConfig'
+import GetSqlConfig from './GetSqlConfig'
 import _ from 'lodash'
+import { mapGetters } from 'vuex'
 const { ipcRenderer } = window.require('electron')
 
 export default {
@@ -50,6 +53,9 @@ export default {
     return {
       searchStr: ''
     }
+  },
+  computed: {
+    ...mapGetters(['getCurrentTable'])
   },
   methods: {
     handleOpenPDM () {
@@ -77,10 +83,28 @@ export default {
       this.$parent.$parent.$parent.$refs.page.genSearchSql()
     },
     handleGenGetSql () {
-      this.$parent.$parent.$parent.$refs.page.genGetSql()
+      this.$Modal.confirm({
+        title: '请选择主键',
+        render: h => {
+          let create = this.$createElement
+          return create(GetSqlConfig, {
+            ref: 'getSqlConfig',
+            props: {
+              currentTable: this.getCurrentTable
+            }
+          })
+        },
+        onOk: () => {
+          let getSqlConfig = _.clone(this.$refs.getSqlConfig)
+          this.$parent.$parent.$parent.$refs.page.genGetSql(getSqlConfig.form)
+        }
+      })
     },
     handleGenSaveSql () {
       this.$parent.$parent.$parent.$refs.page.genSaveSql()
+    },
+    handleCopy () {
+      this.$parent.$parent.$parent.$refs.page.handleCopy()
     },
     handleGenForm () {
       // TODO 弹出一些表单生成的额外配置

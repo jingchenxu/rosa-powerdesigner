@@ -21,7 +21,7 @@ import CodeGenerator from '../utils/CodeGenerator'
 import Vue from 'vue'
 const beautifyJs = require('js-beautify').js_beautify
 
-const { ipcRenderer } = window.require('electron')
+const { ipcRenderer, clipboard } = window.require('electron')
 
 const jdFormatConfig = {
   indent_size: 2,
@@ -141,9 +141,9 @@ export default {
       // this.code = beautify_js(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
     },
-    genGetSql (formConfig) {
+    genGetSql (getSqlConfig) {
       let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genGetSql(formConfig)
+      let file = codeGenerator.genGetSql(getSqlConfig)
       this.code = file.code
       this.fileType = file.fileType
       this.fileName = file.fileName
@@ -162,6 +162,10 @@ export default {
       this.editor.setOption('mode', 'text/x-sql')
       // this.code = beautify_js(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
+    },
+    handleCopy () {
+      clipboard.writeText(this.code)
+      this.$Message.info('复制成功')
     },
     handleExport () {
       let file = {

@@ -301,6 +301,7 @@ class CodeGenerator {
     // 生成调试信息
     codeDebug = `${codeDebug}    \r    @Override\n    public String OnDebug() {\n        return TranUtils.DebugProperty(this, this.OnProperties());\n    }\n\r`
     codeDebug = `${codeDebug}    @Override\n    public String OnCompare() {\n        return TranUtils.CompareProperty((${className})item, this, this.OnProperties());\n    }\n\r`
+    debugString = debugString.substring(0, debugString.length - 2)
     codeDebug = `${codeDebug}    @Override\n    public String[] OnProperties() {\n        return new String[] {${debugString}};\n    }\n\r`
     // TODO 生成exclusiongs
     codeDebug = `${codeDebug}    @Override\n    public String[] OnExclusions() {\n        return new String[] { "deal" };\n    }\n\r`
@@ -355,7 +356,8 @@ class CodeGenerator {
     return file
   }
 
-  genGetSql () {
+  genGetSql (getSqlConfig) {
+    console.dir(getSqlConfig)
     let procedure = ''
     let code = ''
     let tableName = this.table.tablecode.toLowerCase()
@@ -364,10 +366,11 @@ class CodeGenerator {
         procedure = procedure + element
       }
     })
-    let getSql = `select a.* from ${tableName} a where a.coid = @coid`
+    let mainKey = getSqlConfig.mainKey.toLowerCase()
+    let getSql = `select a.* from ${tableName} a where a.${mainKey} = @${mainKey}`
     procedure = `P_Get_${procedure}`
     code = `${code}if (exists (select name from sysobjects where (name = N'${procedure}') and (type = 'P')))\n  drop procedure dbo.${procedure}\ngo\n\r`
-    code = `${code}create procedure [abo].${procedure}\n(\n  @coid varchar(4)\n)\nas\n`
+    code = `${code}create procedure [abo].${procedure}\n(\n  @${mainKey} varchar(4)\n)\nas\n`
     code = `${code}begin\n   ${getSql}\nend\n\rgo`
     let file = {
       code,
@@ -405,6 +408,8 @@ class CodeGenerator {
       insertSqlValue = `${insertSqlValue}@${_columnid}, `
       updateSql = `${updateSql}    ${_columnid} = @${_columnid},\n`
     }
+    insertSqlKey = insertSqlKey.substring(0, insertSqlKey.length - 2)
+    insertSqlValue = insertSqlValue.substring(0, insertSqlValue.length - 2)
     insertSql = `insert into ${tableName}(${insertSqlKey}) values (${insertSqlValue})`
     updateSql = `update ${tableName} set\n${updateSql}   where coid = @coid\n  end\nend\ngo`
     codeParams = `${codeParams}  @action int\n`
