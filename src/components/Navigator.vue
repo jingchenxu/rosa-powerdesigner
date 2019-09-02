@@ -51,9 +51,6 @@ export default {
       searchStr: ''
     }
   },
-  components: {
-    FormConfig
-  },
   methods: {
     handleOpenPDM () {
       let input = document.createElement('input')

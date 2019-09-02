@@ -2,8 +2,8 @@
 
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import {
-  createProtocol,
-  installVueDevtools
+  createProtocol
+  // installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 const getObjectFromPDM = require('./back/getObjectFromPDM')
 const fileExport = require('./back/fileExport')

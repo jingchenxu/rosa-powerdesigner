@@ -18,9 +18,8 @@ import { mapGetters } from 'vuex'
 
 import CodeGenerator from '../utils/CodeGenerator'
 
-import FormPreview from './FormPreview'
 import Vue from 'vue'
-const beautify_js = require('js-beautify').js_beautify
+const beautifyJs = require('js-beautify').js_beautify
 
 const { ipcRenderer } = window.require('electron')
 
@@ -84,7 +83,7 @@ export default {
       this.fileType = file.fileType
       this.fileName = file.fileName
       this.editor.setOption('mode', 'text/javascript')
-      this.code = beautify_js(this.code, jdFormatConfig)
+      this.code = beautifyJs(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
 
       // 开始生成类代码
@@ -96,7 +95,7 @@ export default {
       this.fileType = file.fileType
       this.fileName = file.fileName
       this.editor.setOption('mode', 'text/javascript')
-      this.code = beautify_js(this.code, jdFormatConfig)
+      this.code = beautifyJs(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
     },
     genRule () {
@@ -106,7 +105,7 @@ export default {
       this.fileType = file.fileType
       this.fileName = file.fileName
       this.editor.setOption('mode', 'text/javascript')
-      this.code = beautify_js(this.code, jdFormatConfig)
+      this.code = beautifyJs(this.code, jdFormatConfig)
       this.editor.setValue(this.code)
     },
     genForm (formConfig) {
@@ -175,15 +174,9 @@ export default {
     handlePreview () {
       let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
       let form = Vue.compile(codeGenerator.genFormPreview().code)
-      console.dir(form)
       this.$Modal.info({
         title: '表单页预览',
         render: (h) => {
-          console.dir(h(form, {
-            props: {
-              form: {}
-            }
-          }))
           return h(form)
         }
       })

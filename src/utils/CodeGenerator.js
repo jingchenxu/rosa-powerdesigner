@@ -12,7 +12,7 @@ class CodeGenerator {
       }
     })
     let code = `class ${className} {
-  constructor () {`
+    constructor () {`
     for (let column of this.codeConfig) {
       if (column.isclass) {
         // 生成默认值
@@ -238,7 +238,7 @@ class CodeGenerator {
     let codeStart = `public class ${className} implements BaseBean {\n\r`
     let codeEnd = '\n}'
     let codeItems = ''
-    let codeRules = ''
+    // let codeRules = ''
     let codeDebug = ''
     let debugString = ''
     let classInit = `    @Override\n    public void OnInit() {\n`
@@ -408,9 +408,6 @@ class CodeGenerator {
     insertSql = `insert into ${tableName}(${insertSqlKey}) values (${insertSqlValue})`
     updateSql = `update ${tableName} set\n${updateSql}   where coid = @coid\n  end\nend\ngo`
     codeParams = `${codeParams}  @action int\n`
-    // TODO 存储过程接收的参数
-    // TODO 存储过程新增语句
-    // TODO 存储过程更新语句
     procedure = `P_Save_${procedure}`
     code = `${code}if (exists (select name from sysobjects where (name = N'${procedure}') and (type = 'P')))\n  drop procedure dbo.${procedure}\ngo\n\r`
     code = `${code}create procedure [dbo].${procedure}\n(\n${codeParams})\nas\nbegin\n  set nocount on\n\r`

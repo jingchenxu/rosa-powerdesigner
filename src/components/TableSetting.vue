@@ -10,7 +10,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import getColumns from './columns/tableSettingColumns'
-import { defaultCoreCipherList } from 'constants'
 
 export default {
   name: 'TableSetting',
@@ -30,7 +29,7 @@ export default {
             column.isrule = true
             column.isform = true
             column.componentType = 'Input'
-            let selectKeys = ['type', 'status']
+            // let selectKeys = ['type', 'status']
             switch (column.datatype) {
               case 'varchar':
                 column.componentType = 'Input'
