@@ -7,7 +7,8 @@
       <Layout>
         <Split ref="split" :min="0.25" :max="0.5" v-model="split">
           <div slot="left">
-            <Sider :width="siderWidth" :style="{height: siderHeihgt+'px'}">
+            <!-- 左侧菜单栏目 -->
+            <Sider width="auto" :style="{height: siderHeihgt+'px'}">
               <table-menu :menu="getDBList" />
             </Sider>
           </div>
@@ -123,10 +124,7 @@ const { ipcRenderer } = window.require('electron')
 export default {
   name: 'App',
   computed: {
-    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable']),
-    siderWidth () {
-      return document.body.clientWidth * this.split
-    }
+    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable'])
   },
   components: {
     Navigator,
@@ -196,8 +194,6 @@ body {
       padding: 0;
     }
     .ivu-layout-sider {
-      // min-width: 240px !important;
-      // max-width: 240px !important;
       width: 100%;
       overflow-y: scroll;
     }

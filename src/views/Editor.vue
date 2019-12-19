@@ -175,6 +175,11 @@ export default {
       }
       ipcRenderer.send('code-export', file)
     },
+    // handlePreview () {
+    //   this.$router.push({
+    //     name: 'form-preview'
+    //   })
+    // }
     handlePreview () {
       let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
       let form = Vue.compile(codeGenerator.genFormPreview().code)

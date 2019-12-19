@@ -78,7 +78,7 @@ app.on('ready', async () => {
     // } catch (e) {
     //   console.error('Vue Devtools failed to install:', e.toString())
     // }
-    BrowserWindow.addDevToolsExtension('C:/Users/ASUS/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.1.1_0')
+    BrowserWindow.addDevToolsExtension('C:/Users/ASUS/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.0_0')
   }
   createWindow()
 })
