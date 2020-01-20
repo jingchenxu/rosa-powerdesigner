@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Menu } from 'electron'
 import {
   createProtocol
   // installVueDevtools
@@ -23,6 +23,10 @@ let win
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
 function createWindow () {
+  // 判断如果是生产环境 隐藏窗口菜单栏
+  if (!isDevelopment) {
+    Menu.setApplicationMenu(null)
+  }
   // Create the browser window.
   win = new BrowserWindow({ width: 1200,
     height: 800,

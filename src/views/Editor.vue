@@ -46,6 +46,9 @@ export default {
     this.resizeEditor()
   },
   methods: {
+    /**
+     * 编辑器自适应
+     */
     resizeEditor () {
       let codeMirror = document.getElementsByClassName('CodeMirror')
       codeMirror[0].style.height = (document.body.clientHeight - 86) + 'px'
