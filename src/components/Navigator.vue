@@ -105,7 +105,7 @@
               </Modal>
             </FormItem>
           </Form>
-          <Table :columns="columns1" :data="getTemplateList"></Table>
+          <Table :columns="columns1" size="small" :data="getTemplateList"></Table>
         </TabPane>
         <TabPane label="线上模板" name="name2">标签二的内容</TabPane>
       </Tabs>
@@ -164,8 +164,32 @@ export default {
         },
         {
           title: '操作',
+          align: 'center',
           render: (h, params) => {
-            return h(<Button>删除</Button>)
+            return h('div', [
+              h('i-button', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.handleEdit(params.row)
+                  }
+                }
+              }, '修改'),
+              h('i-button', {
+                props: {
+                  type: 'error',
+                  size: 'small'
+                },
+                on: {
+                  click: () => {
+                    this.handleDelete(params.row)
+                  }
+                }
+              }, '删除')
+            ])
           }
         }
       ]
@@ -271,7 +295,17 @@ export default {
         getTemplateList.push(detailForm)
       }
       this.$store.dispatch('UPDATETEMPLATELIST', getTemplateList)
+      ipcRenderer.send('updateTemplateList', getTemplateList)
       this.formModal = false
+    },
+    handleEdit (row) {
+      this.detailForm = row
+      this.formModal = true
+    },
+    handleDelete (row) {
+      let getTemplateList = this.getTemplateList.filter(template => template.templateid !== row.templateid)
+      this.$store.dispatch('UPDATETEMPLATELIST', getTemplateList)
+      ipcRenderer.send('updateTemplateList', getTemplateList)
     },
     cancelConfirm () {
       this.formModal = false
