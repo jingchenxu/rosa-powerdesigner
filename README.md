@@ -1,6 +1,6 @@
 # Rosa PowerDesigner
 
-这是一个基于[Electron](https://electronjs.org/)的代码生成工具，根据powerdesign PDM 文件生成响应代码。
+这是一个基于[Electron](https://electronjs.org/)的代码生成工具，根据powerdesign PDM 文件生成相应代码。
 > 在前端工作中遇到了一些重复性的工作，所以想到了制作一个代码生成工具，日常的开发工作主要围绕PDM与客户需求展开，其实这个工具也可以生成后端的代码，目前正在完善前端代码生成的功能。
 
 ![app-shoot-1](./public/img/app-shoot-1.png)

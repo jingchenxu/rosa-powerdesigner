@@ -151,8 +151,28 @@ ipcMain.on('app-init', function (event, sign) {
     }
   })
 
+  storage.has('templateList', function (err, haskey) {
+    if (err) throw err
+    if (haskey) {
+      console.log('加载代码模板')
+      storage.get('templateList', function (err, data) {
+        if (err) throw err
+        win.webContents.send('updateTemplateList', data)
+      })
+    } else {
+      storage.set('templateList', [], function (error) {
+        if (error) throw error
+      })
+    }
+  })
+
   // 代码导出
   ipcMain.on('code-export', function (event, file) {
     fileExport(win, file.code, file.fileType, file.fileName)
   })
+})
+
+// 监听模板列表发生修改进行更新
+ipcMain.on('updateTemplateList', function (event, templateList) {
+  storage.set('templateList', templateList)
 })

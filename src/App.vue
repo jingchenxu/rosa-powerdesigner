@@ -96,6 +96,9 @@ export default {
     ipcRenderer.on('update-dbmap', (event, key, dbList) => {
       this.$store.dispatch('UPDATEDBMAP', { key, dbList })
     })
+    ipcRenderer.on('updateTemplateList', (event, templateList) => {
+      this.$store.dispatch('UPDATETEMPLATELIST', templateList)
+    })
   },
   methods: {
     updateAppSetting () {
@@ -135,6 +138,7 @@ body {
     .ivu-layout-sider {
       width: 100%;
       overflow-y: scroll;
+      background-color: white;
     }
     .ivu-layout-footer {
       height: 36px;

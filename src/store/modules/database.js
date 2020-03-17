@@ -8,7 +8,8 @@ const state = {
   dbList: [],
   currentTable: null,
   currentDB: [],
-  codeConfig: []
+  codeConfig: [],
+  templateList: []
 }
 
 const getters = {
@@ -26,6 +27,9 @@ const getters = {
   },
   getCodeConfig (state) {
     return state.codeConfig
+  },
+  getTemplateList (state) {
+    return state.templateList
   }
 }
 
@@ -63,6 +67,9 @@ const mutations = {
       })
       return db
     })
+  },
+  updateTemplateList (state, templateList) {
+    state.templateList = templateList
   }
 }
 
@@ -81,6 +88,9 @@ const actions = {
   },
   FILTERDBLIST (context, searchStr) {
     context.commit('filterDBList', searchStr)
+  },
+  UPDATETEMPLATELIST (context, templateList) {
+    context.commit('updateTemplateList', templateList)
   }
 }
 
