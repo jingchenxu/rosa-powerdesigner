@@ -1,4 +1,4 @@
-![Rosa](./public/img/rosa.png)
+![Rosa](./public/rosa.png)
 
 # Rosa PowerDesigner
 
