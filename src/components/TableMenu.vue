@@ -1,15 +1,6 @@
 <template>
   <div class="table-menu">
-    <!-- <Menu width="auto" @on-select="handleSelect" @on-open-change="handleOpenChange" theme="dark" active-name="1-2" :open-names="['1']">
-      <Submenu :key="dbindex" v-for="(db, dbindex) of menu" :name="db.code">
-        <template slot="title">
-          <Icon type="ios-cog" />
-          {{db.name}}
-        </template>
-        <MenuItem v-show="table.show" :key="tableindex" v-for="(table, tableindex) of db.tables" :name="table.tablecode">{{table.tablecode}}</MenuItem>
-      </Submenu>
-    </Menu> -->
-    <Tree @on-select-change="handleChange" :data="treeDate"></Tree>
+    <Tree ref="tree" empty-text="请打开PDM文件" @on-select-change="handleChange" :data="treeDate"></Tree>
   </div>
 </template>
 
@@ -36,9 +27,9 @@ export default {
               expand: true,
               children: menu.tables.map(table => {
                 let _table = {
-                  title: table.tablecode
+                  title: table.tablecode,
+                  db: menu
                 }
-                console.dir(table)
                 return _table
               })
             }
@@ -50,7 +41,6 @@ export default {
   },
   methods: {
     handleSelect (name) {
-      console.log(`${name}表单被点击`)
       for (let db of this.menu) {
         for (let table of db.tables) {
           if (table.tablecode === name) {
@@ -63,9 +53,9 @@ export default {
       this.$store.dispatch('UPDATECURRENTDB', names)
     },
     handleChange (array, node) {
-      console.dir(array)
-      console.dir(node)
+      // TODO 这里需要找到父节点
       this.handleSelect(node.title)
+      this.$store.dispatch('UPDATECURRENTDB', node.db)
     }
   }
 }

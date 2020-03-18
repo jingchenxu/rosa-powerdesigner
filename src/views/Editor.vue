@@ -79,6 +79,10 @@ export default {
         this.editor = editor
       }
     },
+    setCode (code, editorType) {
+      this.editor.setOption('mode', editorType)
+      this.editor.setValue(code)
+    },
     genClass () {
       let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
       let file = codeGenerator.genClass()
@@ -177,21 +181,6 @@ export default {
         fileName: this.fileName
       }
       ipcRenderer.send('code-export', file)
-    },
-    // handlePreview () {
-    //   this.$router.push({
-    //     name: 'form-preview'
-    //   })
-    // }
-    handlePreview () {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let form = Vue.compile(codeGenerator.genFormPreview().code)
-      this.$Modal.info({
-        title: '表单页预览',
-        render: (h) => {
-          return h(form)
-        }
-      })
     }
   }
 }
