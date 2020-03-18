@@ -1,101 +1,51 @@
 <template>
   <div class="navigator">
     <Button @click="handleOpenPDM" type="primary">打开PDM</Button>
-    <Dropdown transfer-class-name="expand-container">
+    <Dropdown @on-click="handleTemplateClick" transfer-class-name="expand-container">
       <Button type="primary">
-        选择生成操作
+        请选择对应模板
         <Icon type="ios-arrow-down"></Icon>
       </Button>
       <DropdownMenu slot="list">
-        <DropdownItem>
-          <Button @click="handleGenClass" type="primary">生成class文件</Button>
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenColumn" type="primary">生成表头文件</Button>
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenRule" type="primary"
-            >生成表单校验规则</Button
-          >
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenForm" type="primary">生成表单文件</Button>
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenJavaClass" type="primary">生成java类</Button>
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenSearchSql" type="primary"
-            >生成search sql</Button
-          >
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenGetSql" type="primary">生成get sql</Button>
-        </DropdownItem>
-        <DropdownItem>
-          <Button @click="handleGenSaveSql" type="primary">生成save sql</Button>
+        <DropdownItem :key="template.templateid" :name="template.templateid" v-for="template in getTemplateList">
+          {{template.templatename}}
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
     <Button @click="handleCopy" type="primary">复制到粘贴板</Button>
     <Button @click="handleExport" type="primary">导出代码</Button>
-    <Button @click="handlePreview" type="primary">预览表单页</Button>
     <Button @click="handleTemplate" type="primary">模板管理</Button>
-    <Input
-      style="width: auto;"
-      @on-enter="handleSearch"
-      @on-clear="handleSearch"
-      v-model="searchStr"
-      clearable
-      placeholder="请输入查询条件"
-    ></Input>
+    <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input>
     <Modal v-model="modal" fullscreen footer-hide title="模板管理">
       <Tabs value="name1">
         <TabPane label="本地模板" name="name1">
           <Form ref="searchParams" :model="searchParams" inline>
             <FormItem>
               <Button type="primary" @click="addTemplate">新增模板</Button>
-              <Modal v-model="formModal" footer-hide title="新增模板">
+              <Modal v-model="formModal" width="80" footer-hide title="新增模板">
                 <Form :model="detailForm" :label-width="80">
                   <FormItem label="模板名称">
-                    <Input
-                      v-model="detailForm.templatename"
-                      placeholder="请输入模板名称"
-                    ></Input>
+                    <Input v-model="detailForm.templatename" placeholder="请输入模板名称"></Input>
                   </FormItem>
                   <Row>
                     <Col span="12">
-                      <FormItem label="模板代码">
-                        <Input
-                          v-model="detailForm.codelanguage"
-                          placeholder="请输入模板代码"
-                        ></Input>
-                      </FormItem>
+                    <FormItem label="代码语言">
+                      <Select @on-change="handleLanguageChange" label-in-value v-model="detailForm.codelanguage">
+                        <Option v-for="item in codelanguage" :value="item.value" :key="item.value">{{ item.label }}</Option>
+                      </Select>
+                    </FormItem>
                     </Col>
                     <Col span="12">
-                      <FormItem label="文件后缀">
-                        <Input
-                          v-model="detailForm.fileextension"
-                          placeholder="请输入文件后缀"
-                        ></Input>
-                      </FormItem>
+                    <FormItem label="文件后缀">
+                      <Input v-model="detailForm.fileextension" placeholder="请输入文件后缀"></Input>
+                    </FormItem>
                     </Col>
                   </Row>
                   <FormItem label="模板简介">
-                    <Input
-                      v-model="detailForm.bref"
-                      type="textarea"
-                      :autosize="{ minRows: 2, maxRows: 5 }"
-                      placeholder="请输入模板简介"
-                    ></Input>
+                    <Input v-model="detailForm.bref" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入模板简介"></Input>
                   </FormItem>
                   <FormItem label="模板">
-                    <Input
-                      v-model="detailForm.template"
-                      type="textarea"
-                      :rows="12"
-                      placeholder="请输入模板"
-                    ></Input>
+                    <Input v-model="detailForm.template" type="textarea" :rows="12" placeholder="请输入模板"></Input>
                   </FormItem>
                   <FormItem>
                     <Button @click="addConfirm" type="primary">保存</Button>
@@ -107,7 +57,47 @@
           </Form>
           <Table :columns="columns1" size="small" :data="getTemplateList"></Table>
         </TabPane>
-        <TabPane label="线上模板" name="name2">标签二的内容</TabPane>
+        <TabPane label="线上模板" name="name2">
+          <online-template />
+        </TabPane>
+      </Tabs>
+    </Modal>
+    <div @click="login" class="login-container">
+      <Avatar :src="getCurrentUser.avatar" icon="ios-person" />
+    </div>
+    <Modal v-model="loginModal" footer-hide title="登录">
+      <Tabs type="card">
+        <TabPane label="登录">
+          <Form :model="loginParams" :label-width="80">
+            <FormItem label="用户名">
+              <Input v-model="loginParams.nickname" placeholder="请输入用户名"></Input>
+            </FormItem>
+            <FormItem label="密码">
+              <Input v-model="loginParams.password" type="password" placeholder="请输入密码"></Input>
+            </FormItem>
+            <FormItem>
+              <Button @click="handleLogin" type="primary">登录</Button>
+              <Button style="margin-left: 8px">Cancel</Button>
+            </FormItem>
+          </Form>
+        </TabPane>
+        <TabPane label="注册">
+          <Form :model="registerParams" :label-width="80">
+            <FormItem label="用户名">
+              <Input v-model="registerParams.nickname" placeholder="请输入用户名"></Input>
+            </FormItem>
+            <FormItem label="邮箱">
+              <Input v-model="registerParams.email" placeholder="请输入邮箱"></Input>
+            </FormItem>
+            <FormItem label="密码">
+              <Input v-model="registerParams.password" type="password" placeholder="请输入密码"></Input>
+            </FormItem>
+            <FormItem>
+              <Button @click="handleRegister" type="primary">注册</Button>
+              <Button style="margin-left: 8px">Cancel</Button>
+            </FormItem>
+          </Form>
+        </TabPane>
       </Tabs>
     </Modal>
   </div>
@@ -115,9 +105,11 @@
 
 <script>
 import FormConfig from './FormConfig'
-import GetSqlConfig from './GetSqlConfig'
 import _ from 'lodash'
 import { mapGetters } from 'vuex'
+import axios from 'axios'
+import handleLocalStorage from '../utils/handleLocalStorage'
+import OnlineTemplate from './OnlineTemplate'
 const { ipcRenderer } = window.require('electron')
 
 class RosaTemplate {
@@ -129,7 +121,8 @@ class RosaTemplate {
     this.author = ''
     this.authorname = ''
     this.templatetype = 0
-    this.codelanguage = 0
+    this.codelanguage = 1
+    this.codelanguagename = 'java'
     this.fileextension = ''
     this.template = ''
     this.times = 0
@@ -138,13 +131,19 @@ class RosaTemplate {
 
 export default {
   name: 'Navigator',
+  components: {
+    OnlineTemplate
+  },
   data () {
     return {
       searchStr: '',
       modal: false,
       formModal: false,
+      loginModal: false,
       searchParams: {},
       detailForm: {},
+      loginParams: {},
+      registerParams: {},
       columns1: [
         {
           title: '模板名称',
@@ -156,7 +155,7 @@ export default {
         },
         {
           title: '代码语言',
-          key: 'codelanguage'
+          key: 'codelanguagename'
         },
         {
           title: '文件后缀',
@@ -167,36 +166,81 @@ export default {
           align: 'center',
           render: (h, params) => {
             return h('div', [
-              h('i-button', {
-                props: {
-                  type: 'primary',
-                  size: 'small'
-                },
-                on: {
-                  click: () => {
-                    this.handleEdit(params.row)
+              h(
+                'i-button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleEdit(params.row)
+                    }
                   }
-                }
-              }, '修改'),
-              h('i-button', {
-                props: {
-                  type: 'error',
-                  size: 'small'
                 },
-                on: {
-                  click: () => {
-                    this.handleDelete(params.row)
+                '修改'
+              ),
+              h(
+                'i-button',
+                {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleUpload(params.row, params.index)
+                    }
                   }
-                }
-              }, '删除')
+                },
+                '上传'
+              ),
+              h(
+                'i-button',
+                {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  on: {
+                    click: () => {
+                      this.handleDelete(params.row)
+                    }
+                  }
+                },
+                '删除'
+              )
             ])
           }
+        }
+      ],
+      codelanguage: [
+        {
+          value: 1,
+          editorType: 'text/x-java',
+          label: 'java'
+        },
+        {
+          value: 2,
+          editorType: 'text/x-vue',
+          label: 'vue'
+        },
+        {
+          value: 3,
+          editorType: 'text/x-sql',
+          label: 'sql'
+        },
+        {
+          value: 4,
+          editorType: 'text/javascript',
+          label: 'js'
         }
       ]
     }
   },
   computed: {
-    ...mapGetters(['getCurrentTable', 'getTemplateList'])
+    ...mapGetters(['getCurrentTable', 'getTemplateList', 'getActiveTemplate', 'getCurrentUser', 'getToken'])
   },
   methods: {
     handleOpenPDM () {
@@ -207,42 +251,6 @@ export default {
       input.onchange = e => {
         ipcRenderer.send('get-file-path', e.target.files[0].path)
       }
-    },
-    handleGenClass () {
-      this.$parent.$parent.$parent.$refs.page.genClass()
-    },
-    handleGenColumn () {
-      this.$parent.$parent.$parent.$refs.page.genColumn()
-    },
-    handleGenRule () {
-      this.$parent.$parent.$parent.$refs.page.genRule()
-    },
-    handleGenJavaClass () {
-      this.$parent.$parent.$parent.$refs.page.genJavaClass()
-    },
-    handleGenSearchSql () {
-      this.$parent.$parent.$parent.$refs.page.genSearchSql()
-    },
-    handleGenGetSql () {
-      this.$Modal.confirm({
-        title: '请选择主键',
-        render: h => {
-          let create = this.$createElement
-          return create(GetSqlConfig, {
-            ref: 'getSqlConfig',
-            props: {
-              currentTable: this.getCurrentTable
-            }
-          })
-        },
-        onOk: () => {
-          let getSqlConfig = _.clone(this.$refs.getSqlConfig)
-          this.$parent.$parent.$parent.$refs.page.genGetSql(getSqlConfig.form)
-        }
-      })
-    },
-    handleGenSaveSql () {
-      this.$parent.$parent.$parent.$refs.page.genSaveSql()
     },
     handleCopy () {
       this.$parent.$parent.$parent.$refs.page.handleCopy()
@@ -265,9 +273,6 @@ export default {
     },
     handleExport () {
       this.$parent.$parent.$parent.$refs.page.handleExport()
-    },
-    handlePreview () {
-      this.$parent.$parent.$parent.$refs.page.handlePreview()
     },
     handleTemplate () {
       this.modal = true
@@ -302,10 +307,92 @@ export default {
       this.detailForm = row
       this.formModal = true
     },
+    handleUpload (row, index) {
+      axios.post(`${window.process.env.ELECTRON_APP_BASE_API}upload_rosa_template`, row, {
+        headers: {
+          token: this.getToken
+        }
+      }).then(res => {
+        let result = res.data
+        if (result.success) {
+          this.$Message.success(result.msg)
+          let getTemplateList = _.cloneDeep(this.getTemplateList)
+          getTemplateList[index] = result.data
+          this.$store.dispatch('UPDATETEMPLATELIST', getTemplateList)
+          ipcRenderer.send('updateTemplateList', getTemplateList)
+        } else {
+          this.$Message.error(result.msg)
+        }
+      })
+    },
     handleDelete (row) {
-      let getTemplateList = this.getTemplateList.filter(template => template.templateid !== row.templateid)
+      let getTemplateList = this.getTemplateList.filter(
+        template => template.templateid !== row.templateid
+      )
       this.$store.dispatch('UPDATETEMPLATELIST', getTemplateList)
       ipcRenderer.send('updateTemplateList', getTemplateList)
+    },
+    handleTemplateClick (templateid) {
+      this.getTemplateList.forEach(template => {
+        if (template.templateid === templateid) {
+          this.$store.dispatch('UPDATEACTIVETEMPLATE', template)
+        }
+      })
+      const { template, codelanguage } = { ...this.getActiveTemplate }
+      let compiled = _.template(template)
+      let code = compiled(this.getCurrentTable)
+      switch (codelanguage) {
+        case 1:
+          this.$parent.$parent.$parent.$refs.page.setCode(code, 'text/x-java')
+          break
+        case 2:
+          this.$parent.$parent.$parent.$refs.page.setCode(code, 'text/x-vue')
+          break
+        case 3:
+          this.$parent.$parent.$parent.$refs.page.setCode(code, 'text/x-sql')
+          break
+        case 4:
+          this.$parent.$parent.$parent.$refs.page.setCode(
+            code,
+            'text/javascript'
+          )
+          break
+        default:
+          this.$Message.error('模板中未指定代码语言')
+      }
+    },
+    handleLanguageChange (ob) {
+      this.detailForm.codelanguagename = ob.label
+    },
+    login () {
+      // TODO 需要判断用户有没有登录
+      this.loginModal = true
+    },
+    handleLogin () {
+      axios.post(`${window.process.env.ELECTRON_APP_BASE_API}rosa_login`, this.loginParams).then(res => {
+        let result = res.data
+        if (result.success) {
+          this.$store.dispatch('UPDATECURRENTUSER', result.data)
+          this.loginModal = false
+          this.$Message.success(result.msg)
+          handleLocalStorage('set', 'currentUser', JSON.stringify(result.data))
+        } else {
+          this.$Message.error(result.msg)
+        }
+      })
+    },
+    handleRegister () {
+      axios.post(`${window.process.env.ELECTRON_APP_BASE_API}rosa_register`, this.registerParams).then(res => {
+        let result = res.data
+        if (result.success) {
+          this.$store.dispatch('UPDATECURRENTUSER', result.data)
+          this.loginModal = false
+          this.$Message.success(result.msg)
+          handleLocalStorage('set', 'currentUser', JSON.stringify(result.data))
+        } else {
+          this.$Message.error(result.msg)
+        }
+      })
     },
     cancelConfirm () {
       this.formModal = false
@@ -322,6 +409,10 @@ export default {
   padding: 0 10px;
   button {
     margin-right: 5px;
+  }
+  .login-container {
+    height: 50px;
+    float: right;
   }
 }
 </style>

@@ -39,6 +39,7 @@ jspm_packages/
 # dist directories
 dist/
 dist_electron/
+build/
 
 # TypeScript v1 declaration files
 typings/

@@ -9,7 +9,9 @@ const state = {
   currentTable: null,
   currentDB: [],
   codeConfig: [],
-  templateList: []
+  templateList: [],
+  activeTemplate: {},
+  currentUser: {}
 }
 
 const getters = {
@@ -30,6 +32,15 @@ const getters = {
   },
   getTemplateList (state) {
     return state.templateList
+  },
+  getActiveTemplate (state) {
+    return state.activeTemplate
+  },
+  getCurrentUser (state) {
+    return state.currentUser
+  },
+  getToken (state) {
+    return state.currentUser.token
   }
 }
 
@@ -70,6 +81,12 @@ const mutations = {
   },
   updateTemplateList (state, templateList) {
     state.templateList = templateList
+  },
+  updateActiveTemplate (state, activeTemplate) {
+    state.activeTemplate = activeTemplate
+  },
+  updateCurrentUser (state, currentUser) {
+    state.currentUser = currentUser
   }
 }
 
@@ -91,6 +108,12 @@ const actions = {
   },
   UPDATETEMPLATELIST (context, templateList) {
     context.commit('updateTemplateList', templateList)
+  },
+  UPDATEACTIVETEMPLATE (context, activeTemplate) {
+    context.commit('updateActiveTemplate', activeTemplate)
+  },
+  UPDATECURRENTUSER (context, currentUser) {
+    context.commit('updateCurrentUser', currentUser)
   }
 }
 

@@ -22,9 +22,9 @@
       <Footer>
         <Row>
           <Col span="20">
-          <Breadcrumb v-if="getCurrentDB.length > 0">
+          <Breadcrumb v-if="getCurrentDB">
             <BreadcrumbItem>
-              <Icon type="ios-home-outline"></Icon> {{getCurrentDB[0]}}
+              <Icon type="ios-home-outline"></Icon> {{getCurrentDB.name}}
             </BreadcrumbItem>
             <BreadcrumbItem v-if="getCurrentTable">
               <Icon type="logo-buffer"></Icon> <span class="table-name" @click="handleTableSetting">{{getCurrentTable['tablecode']}}</span>
@@ -57,6 +57,7 @@ import TableMenu from './components/TableMenu'
 import TableSetting from './components/TableSetting'
 import AppSetting from './components/AppSetting'
 import { mapGetters } from 'vuex'
+import handleLocalStorage from './utils/handleLocalStorage'
 const { ipcRenderer } = window.require('electron')
 
 export default {
@@ -82,6 +83,10 @@ export default {
   },
   beforeCreate () {
     ipcRenderer.send('app-init', 'ping')
+    // FIXME 处理生产模式下BASE_API丢失问题
+    if (!window.process.env.ELECTRON_APP_BASE_API) {
+      window.process.env.ELECTRON_APP_BASE_API = 'http://www.deepwater.tech/codekeep/api/v1.0/'
+    }
   },
   mounted () {
     window.addEventListener('resize', () => {
@@ -99,6 +104,10 @@ export default {
     ipcRenderer.on('updateTemplateList', (event, templateList) => {
       this.$store.dispatch('UPDATETEMPLATELIST', templateList)
     })
+    let currentUser = handleLocalStorage('get', 'currentUser')
+    if (currentUser) {
+      this.$store.dispatch('UPDATECURRENTUSER', JSON.parse(currentUser))
+    }
   },
   methods: {
     updateAppSetting () {

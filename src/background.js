@@ -84,6 +84,9 @@ app.on('ready', async () => {
     // }
     BrowserWindow.addDevToolsExtension('C:/Users/ASUS/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.0_0')
   }
+  var networkInterfaces = os.networkInterfaces()
+  // 获取mac
+  console.info(networkInterfaces)
   createWindow()
 })
 
