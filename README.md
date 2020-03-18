@@ -1,3 +1,5 @@
+![Rosa](./public/img/rosa.png)
+
 # Rosa PowerDesigner
 
 这是一个基于[Electron](https://electronjs.org/)的代码生成工具，根据powerdesign PDM 文件生成相应代码。
