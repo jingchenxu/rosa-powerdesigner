@@ -16,12 +16,8 @@ import 'codemirror/mode/sql/sql'
 
 import { mapGetters } from 'vuex'
 
-import CodeGenerator from '../utils/CodeGenerator'
-
 import Vue from 'vue'
 const beautifyJs = require('js-beautify').js_beautify
-
-const { ipcRenderer, clipboard } = window.require('electron')
 
 const jdFormatConfig = {
   indent_size: 2,
@@ -82,105 +78,6 @@ export default {
     setCode (code, editorType) {
       this.editor.setOption('mode', editorType)
       this.editor.setValue(code)
-    },
-    genClass () {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genClass()
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      this.editor.setOption('mode', 'text/javascript')
-      this.code = beautifyJs(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-
-      // 开始生成类代码
-    },
-    genColumn () {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genColumn()
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      this.editor.setOption('mode', 'text/javascript')
-      this.code = beautifyJs(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genRule () {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genRule()
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      this.editor.setOption('mode', 'text/javascript')
-      this.code = beautifyJs(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genForm (formConfig) {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genForm(formConfig)
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      // TODO 需要添加编辑器对vue的支持
-      this.editor.setOption('mode', 'text/x-vue')
-      // this.code = beautify_js(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genJavaClass (formConfig) {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genJavaClass(formConfig)
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      // TODO 需要添加编辑器对vue的支持
-      this.editor.setOption('mode', 'text/x-java')
-      // this.code = beautify_js(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genSearchSql (formConfig) {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genSearchSql(formConfig)
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      // TODO 需要添加编辑器对vue的支持
-      this.editor.setOption('mode', 'text/x-sql')
-      // this.code = beautify_js(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genGetSql (getSqlConfig) {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genGetSql(getSqlConfig)
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      // TODO 需要添加编辑器对vue的支持
-      this.editor.setOption('mode', 'text/x-sql')
-      // this.code = beautify_js(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    genSaveSql (formConfig) {
-      let codeGenerator = new CodeGenerator(this.getCodeConfig, this.getCurrentTable)
-      let file = codeGenerator.genSaveSql(formConfig)
-      this.code = file.code
-      this.fileType = file.fileType
-      this.fileName = file.fileName
-      // TODO 需要添加编辑器对vue的支持
-      this.editor.setOption('mode', 'text/x-sql')
-      // this.code = beautify_js(this.code, jdFormatConfig)
-      this.editor.setValue(this.code)
-    },
-    handleCopy () {
-      clipboard.writeText(this.code)
-      this.$Message.info('复制成功')
-    },
-    handleExport () {
-      let file = {
-        code: this.code,
-        fileType: this.fileType,
-        fileName: this.fileName
-      }
-      ipcRenderer.send('code-export', file)
     }
   }
 }
@@ -190,4 +87,8 @@ export default {
 .editor {
   min-height: 100%;
 }
+
+    .CodeMirror {
+      box-shadow: none !important;
+    }
 </style>

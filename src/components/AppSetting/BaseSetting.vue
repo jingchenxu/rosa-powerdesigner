@@ -3,9 +3,9 @@
     <FormItem label="Name" prop="name">
       <Input v-model="appConfig.name" placeholder="Enter your name"></Input>
     </FormItem>
-    <FormItem label="E-mail" prop="mail">
-      <Input v-model="appConfig.mail" placeholder="Enter your e-mail"></Input>
-    </FormItem>
+                  <FormItem label="问题标题" prop="bref">
+                    <Input v-model="appConfig.bref" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入模板简介"></Input>
+                  </FormItem>
     <FormItem>
       <Button type="primary" @click="handleSubmit('appConfig')">Submit</Button>
       <Button @click="handleReset('appConfig')" style="margin-left: 8px">Reset</Button>

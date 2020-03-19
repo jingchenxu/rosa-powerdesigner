@@ -5,7 +5,7 @@
         <Navigator />
       </Header>
       <Layout>
-        <Split ref="split" :min="0.25" :max="0.5" v-model="split">
+        <Split ref="split" :min="0.15" :max="0.7" v-model="split">
           <div slot="left">
             <!-- 左侧菜单栏目 -->
             <Sider width="auto" :style="{height: siderHeihgt+'px'}">

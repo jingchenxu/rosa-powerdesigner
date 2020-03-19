@@ -171,6 +171,7 @@ ipcMain.on('app-init', function (event, sign) {
 
   // 代码导出
   ipcMain.on('code-export', function (event, file) {
+    console.log('FIXME 文件保存, 如果没有日志，这里会抖动')
     fileExport(win, file.code, file.fileType, file.fileName)
   })
 })

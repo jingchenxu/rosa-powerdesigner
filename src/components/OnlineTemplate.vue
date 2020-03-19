@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Form ref="formInline" :model="searchParams" :label-width="80" inline>
+    <Form ref="formInline" label-position="left" :model="searchParams" :label-width="60" inline>
       <FormItem label="模板名称" prop="templatename">
         <Input clearable type="text" v-model="searchParams.templatename" placeholder="请输入模板名称">
         </Input>
@@ -9,11 +9,11 @@
         <Input clearable type="text" v-model="searchParams.bref" placeholder="请输入模板简介">
         </Input>
       </FormItem>
-      <FormItem>
-        <Button type="primary" @click="onSearch">查询</Button>
+      <FormItem :label-width="0">
+        <Button icon="ios-search" :loading="loading" type="primary" @click="onSearch">查询</Button>
       </FormItem>
     </Form>
-    <Table :columns="columns" size="small" :data="list"></Table>
+    <Table :columns="columns" :loading="loading" size="small" :data="list"></Table>
     <Divider />
     <Page @on-change="pageChange" :page-size="10" :total="total" />
   </div>
@@ -34,6 +34,7 @@ export default {
       searchParams: {},
       pagenumber: 1,
       total: 0,
+      loading: false,
       columns: [
         {
           title: '模板名称',
@@ -60,6 +61,7 @@ export default {
           align: 'center',
           render: (h, params) => {
             let hasDownload = this.getTemplateList.map(template => template.templateid).includes(params.row.templateid)
+            let btnText = hasDownload ? '已下载' : '下载'
 
             return h('div', [
               h(
@@ -67,7 +69,6 @@ export default {
                 {
                   props: {
                     type: 'primary',
-                    size: 'small',
                     disabled: hasDownload
                   },
                   on: {
@@ -76,7 +77,7 @@ export default {
                     }
                   }
                 },
-                '下载'
+                btnText
               )
             ])
           }
@@ -89,6 +90,7 @@ export default {
   },
   methods: {
     onSearch () {
+      this.loading = true
       let searchParams = _.cloneDeep(this.searchParams)
       Object.assign(searchParams, {
         pagenumber: this.pagenumber
@@ -101,6 +103,9 @@ export default {
           let result = res.data
           this.list = result.list
           this.total = result.total
+        })
+        .finally(() => {
+          this.loading = false
         })
     },
     pageChange (pagenumber) {
