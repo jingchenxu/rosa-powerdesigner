@@ -7,9 +7,11 @@ import {
 } from 'vue-cli-plugin-electron-builder/lib'
 const getObjectFromPDM = require('./back/getObjectFromPDM')
 const fileExport = require('./back/fileExport')
+const defaultAppConfig = require('./back/defaultAppConfig')
 const path = require('path')
 const storage = require('electron-json-storage')
 const os = require('os')
+const getMAC = require('getmac').default
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 storage.setDataPath(os.tmpdir())
@@ -30,6 +32,10 @@ function createWindow () {
   // Create the browser window.
   win = new BrowserWindow({ width: 1200,
     height: 800,
+    minWidth: 1200,
+    minHeight: 800,
+    backgroundColor: '#2e2c29',
+    icon: '../public/rosa.png',
     webPreferences: {
       nodeIntegration: true
     } })
@@ -43,6 +49,10 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.once('ready-to-show', () => {
+    win.show()
+  })
 
   win.on('closed', () => {
     win = null
@@ -169,13 +179,64 @@ ipcMain.on('app-init', function (event, sign) {
     }
   })
 
+  storage.has('appConfig', function (err, haskey) {
+    if (err) throw err
+    if (haskey) {
+      storage.get('appConfig', function (err, data) {
+        if (err) throw err
+        win.webContents.send('updateAppConfig', data)
+      })
+    } else {
+      storage.set('appConfig', defaultAppConfig, function (error) {
+        if (error) throw error
+        win.webContents.send('updateAppConfig', defaultAppConfig)
+      })
+    }
+  })
+
   // 代码导出
   ipcMain.on('code-export', function (event, file) {
+    console.log('FIXME 文件保存, 如果没有日志，这里会抖动')
     fileExport(win, file.code, file.fileType, file.fileName)
+  })
+
+  ipcMain.on('updateAppConfig', function (event, appConfig) {
+    storage.set('appConfig', appConfig)
   })
 })
 
 // 监听模板列表发生修改进行更新
 ipcMain.on('updateTemplateList', function (event, templateList) {
   storage.set('templateList', templateList)
+})
+
+// 监听github登录
+ipcMain.on('githubLogin', function (event) {
+  let login = new BrowserWindow({ width: 400,
+    height: 500,
+    parent: win,
+    modal: true,
+    resizable: false,
+    movable: false,
+    webPreferences: {
+      nodeIntegration: true
+    } })
+
+  login.removeMenu()
+
+  login.loadURL(`https://github.com/login/oauth/authorize?client_id=Iv1.1f53d92f0acfd153&state=STATE&redirect_uri=http://www.deepwater.tech/codekeep/api/v1.0/github_callback?userid=${getMAC()};`)
+
+  login.webContents.on('will-redirect', event => {
+    console.log('页面即将重定向')
+    login.webContents.on('dom-ready', event => {
+      console.log('页面加载完成')
+      console.dir(event)
+
+      login.destroy()
+    })
+  })
+
+  login.on('closed', () => {
+    login = null
+  })
 })

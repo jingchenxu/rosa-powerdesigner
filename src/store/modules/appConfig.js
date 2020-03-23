@@ -3,28 +3,54 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-class AppConfig {
-  constructor () {
-    // 主题颜色
-    this.themeColor = ''
-    // 数据库类型
-    this.dbType = ''
+const state = {
+  appConfig: {
+    appTheme: 'theme1',
+    editorTheme: 'darcula'
   }
 }
 
-const state = new AppConfig()
-
 const getters = {
-  getThemeColor (state) {
-    return state.themeColor
+  getAppConfig (state) {
+    return state.appConfig
   },
-  getDbType (state) {
-    return state.dbType
+  getAppTheme (state) {
+    return state.appConfig.appTheme
+  },
+  getEditorTheme (state) {
+    return state.appConfig.editorTheme
   }
 }
 
 const mutations = {
-  updateThemeColor (state, themeColor) {
-    state.themeColor = themeColor
+  updateAppConfig (state, appConfig) {
+    state.appConfig = appConfig
+  },
+  updateAppTheme (state, appTheme) {
+    state.appConfig.appTheme = appTheme
+  },
+  updateEditorTheme (state, editorTheme) {
+    state.appConfig.editorTheme = editorTheme
   }
 }
+
+const actions = {
+  UPDATEAPPCONFIG (context, appConfig) {
+    context.commit('updateAppConfig', appConfig)
+  },
+  UPDATEAPPTHEME (context, appTheme) {
+    context.commit('updateAppTheme', appTheme)
+  },
+  UPDATEEDITORTHEME (context, editorTheme) {
+    context.commit('updateEditorTheme', editorTheme)
+  }
+}
+
+const appconfig = {
+  state,
+  getters,
+  mutations,
+  actions
+}
+
+export default appconfig

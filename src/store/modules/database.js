@@ -22,7 +22,13 @@ const getters = {
     return state.dbMap
   },
   getCurrentTable (state) {
-    return state.currentTable
+    if (state.currentTable) {
+      return state.currentTable
+    } else {
+      return {
+        columns: []
+      }
+    }
   },
   getCurrentDB (state) {
     return state.currentDB
@@ -55,6 +61,11 @@ const mutations = {
       })
       state.dbList.push(item)
     })
+    const { dbList } = { ...state }
+    if (dbList.length > 0) {
+      state.currentDB = dbList[0]
+      state.currentTable = dbList[0].tables[0]
+    }
   },
   updateCurrentTable (state, currentTable) {
     state.currentTable = currentTable

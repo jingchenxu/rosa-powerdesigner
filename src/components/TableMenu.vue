@@ -15,19 +15,37 @@ export default {
       }
     }
   },
+  data () {
+    return {
+      value: ''
+    }
+  },
   computed: {
     treeDate () {
-      return this.menu.map(menu => {
+      return this.menu.map((menu, dbIndex) => {
         let temp = {
           title: menu.name,
-          expand: true,
+          expand: dbIndex === 0,
           children: [
             {
               title: '表',
-              expand: true,
-              children: menu.tables.map(table => {
+              expand: dbIndex === 0,
+              render: (h, { root, node, data }) => {
+                let icon = h('Icon', {
+                  style: {
+                    display: 'inlineb-lock',
+                    marginRight: '6px'
+                  },
+                  props: {
+                    type: 'ios-folder-outline'
+                  }
+                })
+                return h('span', [icon, '表'])
+              },
+              children: menu.tables.map((table, index) => {
                 let _table = {
                   title: table.tablecode,
+                  selected: (index === 0) && (dbIndex === 0),
                   db: menu
                 }
                 return _table

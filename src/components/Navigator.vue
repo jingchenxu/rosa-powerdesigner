@@ -1,6 +1,6 @@
 <template>
   <div class="navigator">
-    <Button @click="handleOpenPDM" type="primary">打开PDM</Button>
+    <Button icon="ios-folder-open" @click="handleOpenPDM" type="primary">打开PDM</Button>
     <Dropdown @on-click="handleTemplateClick" transfer-class-name="expand-container">
       <Button type="primary">
         请选择对应模板
@@ -12,16 +12,16 @@
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-    <Button @click="handleCopy" type="primary">复制到粘贴板</Button>
-    <Button @click="handleExport" type="primary">导出代码</Button>
-    <Button @click="handleTemplate" type="primary">模板管理</Button>
+    <Button icon="md-copy" @click="handleCopy" type="primary">复制到粘贴板</Button>
+    <Button icon="ios-share-alt" @click="handleExport" type="primary">导出代码</Button>
+    <Button icon="ios-albums" @click="handleTemplate" type="primary">模板管理</Button>
     <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input>
     <Modal v-model="modal" fullscreen footer-hide title="模板管理">
       <Tabs value="name1">
         <TabPane label="本地模板" name="name1">
           <Form ref="searchParams" :model="searchParams" inline>
             <FormItem>
-              <Button type="primary" @click="addTemplate">新增模板</Button>
+              <Button icon="md-add" type="primary" @click="addTemplate">新增模板</Button>
               <Modal v-model="formModal" width="80" footer-hide title="新增模板">
                 <Form :model="detailForm" :label-width="80">
                   <FormItem label="模板名称">
@@ -37,7 +37,7 @@
                     </Col>
                     <Col span="12">
                     <FormItem label="文件后缀">
-                      <Input v-model="detailForm.fileextension" placeholder="请输入文件后缀"></Input>
+                      <Input disabled v-model="detailForm.fileextension" placeholder="请输入文件后缀"></Input>
                     </FormItem>
                     </Col>
                   </Row>
@@ -63,7 +63,7 @@
       </Tabs>
     </Modal>
     <div @click="login" class="login-container">
-      <Avatar :src="getCurrentUser.avatar" icon="ios-person" />
+      <Avatar shape="square" :src="getCurrentUser.avatar" icon="ios-person" />
     </div>
     <Modal v-model="loginModal" footer-hide title="登录">
       <Tabs type="card">
@@ -77,6 +77,7 @@
             </FormItem>
             <FormItem>
               <Button @click="handleLogin" type="primary">登录</Button>
+              <Button @click="handleGithubLogin" type="primary">github登录</Button>
               <Button style="margin-left: 8px">Cancel</Button>
             </FormItem>
           </Form>
@@ -104,13 +105,13 @@
 </template>
 
 <script>
-import FormConfig from './FormConfig'
 import _ from 'lodash'
 import { mapGetters } from 'vuex'
 import axios from 'axios'
 import handleLocalStorage from '../utils/handleLocalStorage'
 import OnlineTemplate from './OnlineTemplate'
-const { ipcRenderer } = window.require('electron')
+import getMAC from 'getmac'
+const { ipcRenderer, clipboard } = window.require('electron')
 
 class RosaTemplate {
   constructor () {
@@ -123,7 +124,7 @@ class RosaTemplate {
     this.templatetype = 0
     this.codelanguage = 1
     this.codelanguagename = 'java'
-    this.fileextension = ''
+    this.fileextension = 'java'
     this.template = ''
     this.times = 0
   }
@@ -163,15 +164,18 @@ export default {
         },
         {
           title: '操作',
+          width: 270,
           align: 'center',
           render: (h, params) => {
             return h('div', [
               h(
                 'i-button',
                 {
+                  style: {
+                    marginRight: '5px'
+                  },
                   props: {
-                    type: 'primary',
-                    size: 'small'
+                    type: 'primary'
                   },
                   on: {
                     click: () => {
@@ -184,9 +188,11 @@ export default {
               h(
                 'i-button',
                 {
+                  style: {
+                    marginRight: '5px'
+                  },
                   props: {
-                    type: 'primary',
-                    size: 'small'
+                    type: 'primary'
                   },
                   on: {
                     click: () => {
@@ -200,8 +206,7 @@ export default {
                 'i-button',
                 {
                   props: {
-                    type: 'error',
-                    size: 'small'
+                    type: 'error'
                   },
                   on: {
                     click: () => {
@@ -240,7 +245,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getCurrentTable', 'getTemplateList', 'getActiveTemplate', 'getCurrentUser', 'getToken'])
+    ...mapGetters(['getCurrentTable', 'getTemplateList', 'getActiveTemplate', 'getCurrentUser', 'getToken']),
+    getUserId () {
+      return this.getCurrentUser.userid ? this.getCurrentUser.userid : getMAC()
+    }
   },
   methods: {
     handleOpenPDM () {
@@ -252,27 +260,36 @@ export default {
         ipcRenderer.send('get-file-path', e.target.files[0].path)
       }
     },
-    handleCopy () {
-      this.$parent.$parent.$parent.$refs.page.handleCopy()
-    },
-    handleGenForm () {
-      // TODO 弹出一些表单生成的额外配置
+    handleExport () {
+      const { fileextension } = { ...this.getActiveTemplate }
       this.$Modal.confirm({
-        title: '表单生成配置',
-        render: h => {
-          let create = this.$createElement
-          return create(FormConfig, {
-            ref: 'formConfig'
+        render: (h) => {
+          return h('Input', {
+            props: {
+              value: this.value,
+              autofocus: true,
+              placeholder: '请输入文件名'
+            },
+            on: {
+              input: (fileName) => {
+                this.value = fileName
+              }
+            }
           })
         },
         onOk: () => {
-          let formConfig = _.clone(this.$refs.formConfig)
-          this.$parent.$parent.$parent.$refs.page.genForm(formConfig.form)
+          let file = {
+            code: this.genCode(),
+            fileType: fileextension,
+            fileName: this.value
+          }
+          ipcRenderer.send('code-export', file)
         }
       })
     },
-    handleExport () {
-      this.$parent.$parent.$parent.$refs.page.handleExport()
+    handleCopy () {
+      clipboard.writeText(this.genCode())
+      this.$Message.info('复制成功')
     },
     handleTemplate () {
       this.modal = true
@@ -332,15 +349,20 @@ export default {
       this.$store.dispatch('UPDATETEMPLATELIST', getTemplateList)
       ipcRenderer.send('updateTemplateList', getTemplateList)
     },
+    genCode () {
+      const { template } = { ...this.getActiveTemplate }
+      let compiled = _.template(template)
+      let code = compiled(this.getCurrentTable)
+      return code
+    },
     handleTemplateClick (templateid) {
       this.getTemplateList.forEach(template => {
         if (template.templateid === templateid) {
           this.$store.dispatch('UPDATEACTIVETEMPLATE', template)
         }
       })
-      const { template, codelanguage } = { ...this.getActiveTemplate }
-      let compiled = _.template(template)
-      let code = compiled(this.getCurrentTable)
+      const { codelanguage } = { ...this.getActiveTemplate }
+      let code = this.genCode()
       switch (codelanguage) {
         case 1:
           this.$parent.$parent.$parent.$refs.page.setCode(code, 'text/x-java')
@@ -363,6 +385,7 @@ export default {
     },
     handleLanguageChange (ob) {
       this.detailForm.codelanguagename = ob.label
+      this.detailForm.fileextension = ob.label
     },
     login () {
       // TODO 需要判断用户有没有登录
@@ -381,6 +404,10 @@ export default {
         }
       })
     },
+    handleGithubLogin () {
+      ipcRenderer.send('githubLogin')
+      // location.href = 'https://github.com/login/oauth/authorize?client_id=Iv1.1f53d92f0acfd153&state=STATE&redirect_uri=http://www.deepwater.tech/codekeep/api/v1.0/github_callback;'
+    },
     handleRegister () {
       axios.post(`${window.process.env.ELECTRON_APP_BASE_API}rosa_register`, this.registerParams).then(res => {
         let result = res.data
@@ -396,6 +423,42 @@ export default {
     },
     cancelConfirm () {
       this.formModal = false
+    }
+  },
+  mounted () {
+    let socket
+    // 使用mac编号作为身份凭证
+    if (socket != null) {
+      socket.close()
+      socket = null
+    }
+    socket = new WebSocket(`ws://118.24.155.81:2048/codekeep/imserver/${this.getUserId}`)
+    // 打开事件
+    socket.onopen = function () {
+      console.log('websocket已打开')
+      // socket.send("这是来自客户端的消息" + location.href + new Date());
+    }
+    // 获得消息事件
+    socket.onmessage = message => {
+      console.log(message.data)
+      let result = JSON.parse(message.data)
+      if (result.success) {
+        this.loginModal = false
+        this.$Message.success(result.msg)
+        this.$store.dispatch('UPDATECURRENTUSER', result.data)
+        handleLocalStorage('set', 'currentUser', JSON.stringify(result.data))
+      } else {
+        this.$Message.error(result.msg)
+      }
+      // 发现消息进入    开始处理前端触发逻辑
+    }
+    // 关闭事件
+    socket.onclose = function () {
+      console.log('websocket已关闭')
+    }
+    // 发生了错误事件
+    socket.onerror = function () {
+      console.log('websocket发生了错误')
     }
   }
 }
