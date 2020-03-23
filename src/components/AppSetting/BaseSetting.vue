@@ -1,30 +1,42 @@
 <template>
-  <Form ref="appConfig" :model="appConfig" :rules="appRule" :label-width="80">
-    <FormItem label="Name" prop="name">
-      <Input v-model="appConfig.name" placeholder="Enter your name"></Input>
-    </FormItem>
-                  <FormItem label="问题标题" prop="bref">
-                    <Input v-model="appConfig.bref" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="请输入模板简介"></Input>
-                  </FormItem>
-    <FormItem>
-      <Button type="primary" @click="handleSubmit('appConfig')">Submit</Button>
-      <Button @click="handleReset('appConfig')" style="margin-left: 8px">Reset</Button>
+  <Form ref="appConfig" :model="appConfig" :rules="appRule" :label-width="100">
+    <FormItem label="编辑器主题" prop="editorTheme">
+      <Select @on-change="editorThemeChange" value="getEditorTheme">
+        <Option v-for="editorTheme in editorThemes" :value="editorTheme" :key="editorTheme">{{ editorTheme }}</Option>
+      </Select>
     </FormItem>
   </Form>
 </template>
 
 <script>
+import editorThemes from './editorThemes'
+import { mapGetters } from 'vuex'
+const { ipcRenderer } = window.require('electron')
+
 const name = 'BaseSetting'
 
 export default {
   name,
+  computed: {
+    ...mapGetters(['getAppConfig', 'getEditorTheme'])
+  },
   data () {
     return {
-      appConfig: {},
-      appRule: {}
+      appConfig: {
+        editorTheme: '3024-day'
+      },
+      appRule: {},
+      editorThemes
     }
   },
   methods: {
+    editorThemeChange (editorTheme) {
+      console.log(editorTheme)
+      this.$store.dispatch('UPDATEEDITORTHEME', editorTheme)
+      const appConfig = this.getAppConfig
+      appConfig.editorTheme = editorTheme
+      ipcRenderer.send('updateAppConfig', appConfig)
+    },
     handleSubmit () {},
     handleReset () {}
   }

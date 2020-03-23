@@ -77,6 +77,7 @@
             </FormItem>
             <FormItem>
               <Button @click="handleLogin" type="primary">登录</Button>
+              <Button @click="handleGithubLogin" type="primary">github登录</Button>
               <Button style="margin-left: 8px">Cancel</Button>
             </FormItem>
           </Form>
@@ -109,6 +110,7 @@ import { mapGetters } from 'vuex'
 import axios from 'axios'
 import handleLocalStorage from '../utils/handleLocalStorage'
 import OnlineTemplate from './OnlineTemplate'
+import getMAC from 'getmac'
 const { ipcRenderer, clipboard } = window.require('electron')
 
 class RosaTemplate {
@@ -243,7 +245,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getCurrentTable', 'getTemplateList', 'getActiveTemplate', 'getCurrentUser', 'getToken'])
+    ...mapGetters(['getCurrentTable', 'getTemplateList', 'getActiveTemplate', 'getCurrentUser', 'getToken']),
+    getUserId () {
+      return this.getCurrentUser.userid ? this.getCurrentUser.userid : getMAC()
+    }
   },
   methods: {
     handleOpenPDM () {
@@ -399,6 +404,10 @@ export default {
         }
       })
     },
+    handleGithubLogin () {
+      ipcRenderer.send('githubLogin')
+      // location.href = 'https://github.com/login/oauth/authorize?client_id=Iv1.1f53d92f0acfd153&state=STATE&redirect_uri=http://www.deepwater.tech/codekeep/api/v1.0/github_callback;'
+    },
     handleRegister () {
       axios.post(`${window.process.env.ELECTRON_APP_BASE_API}rosa_register`, this.registerParams).then(res => {
         let result = res.data
@@ -414,6 +423,42 @@ export default {
     },
     cancelConfirm () {
       this.formModal = false
+    }
+  },
+  mounted () {
+    let socket
+    // 使用mac编号作为身份凭证
+    if (socket != null) {
+      socket.close()
+      socket = null
+    }
+    socket = new WebSocket(`ws://118.24.155.81:2048/codekeep/imserver/${this.getUserId}`)
+    // 打开事件
+    socket.onopen = function () {
+      console.log('websocket已打开')
+      // socket.send("这是来自客户端的消息" + location.href + new Date());
+    }
+    // 获得消息事件
+    socket.onmessage = message => {
+      console.log(message.data)
+      let result = JSON.parse(message.data)
+      if (result.success) {
+        this.loginModal = false
+        this.$Message.success(result.msg)
+        this.$store.dispatch('UPDATECURRENTUSER', result.data)
+        handleLocalStorage('set', 'currentUser', JSON.stringify(result.data))
+      } else {
+        this.$Message.error(result.msg)
+      }
+      // 发现消息进入    开始处理前端触发逻辑
+    }
+    // 关闭事件
+    socket.onclose = function () {
+      console.log('websocket已关闭')
+    }
+    // 发生了错误事件
+    socket.onerror = function () {
+      console.log('websocket发生了错误')
     }
   }
 }

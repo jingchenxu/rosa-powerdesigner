@@ -5,9 +5,8 @@
         <Navigator />
       </Header>
       <Layout>
-        <Split ref="split" :min="0.15" :max="0.7" v-model="split">
+        <Split ref="split" :min="0.2" :max="0.7" v-model="split">
           <div slot="left">
-            <!-- 左侧菜单栏目 -->
             <Sider width="auto" :style="{height: siderHeihgt+'px'}">
               <table-menu :menu="getDBList" />
             </Sider>
@@ -42,10 +41,10 @@
         </Row>
       </Footer>
     </Layout>
-    <Modal v-model="showSetting" scrollable class-name="vertical-center-modal" footer-hide title="设置软件" @on-ok="updateAppConfig">
+    <Modal v-model="showSetting" scrollable class-name="vertical-center-modal" footer-hide title="软件设置" @on-ok="updateAppConfig">
       <app-setting></app-setting>
     </Modal>
-    <Modal :width="800" v-model="showTableSetting" title="代码生成设置">
+    <Modal :width="800" footer-hide v-model="showTableSetting" :title="modalTitle">
       <table-setting />
     </Modal>
   </div>
@@ -63,7 +62,10 @@ const { ipcRenderer } = window.require('electron')
 export default {
   name: 'App',
   computed: {
-    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable'])
+    ...mapGetters(['getDBList', 'getDBMap', 'getCurrentDB', 'getCurrentTable']),
+    modalTitle () {
+      return `${this.getCurrentTable.tablecode}(${this.getCurrentTable.tablename})`
+    }
   },
   components: {
     Navigator,
@@ -78,7 +80,7 @@ export default {
       formValidate: {},
       ruleValidate: {},
       showTableSetting: false,
-      split: 0.3
+      split: 0.2
     }
   },
   beforeCreate () {
@@ -103,6 +105,9 @@ export default {
     })
     ipcRenderer.on('updateTemplateList', (event, templateList) => {
       this.$store.dispatch('UPDATETEMPLATELIST', templateList)
+    })
+    ipcRenderer.on('updateAppConfig', (event, appConfig) => {
+      this.$store.dispatch('UPDATEAPPCONFIG', appConfig)
     })
     let currentUser = handleLocalStorage('get', 'currentUser')
     if (currentUser) {
