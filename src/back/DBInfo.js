@@ -4,6 +4,7 @@ class Column {
     this.columnname = ''
     this.columnid = ''
     this.ismainkey = false
+    this.canedit = false
     this.datatype = ''
     this.length = ''
     this.mandatory = ''

@@ -55,7 +55,7 @@
               </Modal>
             </FormItem>
           </Form>
-          <Table :columns="columns1" size="small" :data="getTemplateList"></Table>
+          <Table :columns="columns1" size="small" stripe :data="getTemplateList"></Table>
         </TabPane>
         <TabPane label="线上模板" name="name2">
           <online-template />
@@ -146,6 +146,11 @@ export default {
       loginParams: {},
       registerParams: {},
       columns1: [
+        {
+          title: '序号',
+          width: 50,
+          type: 'index'
+        },
         {
           title: '模板名称',
           key: 'templatename'
