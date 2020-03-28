@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Form ref="formInline" label-position="left" :model="searchParams" :label-width="60" inline>
+    <Form ref="formInline" label-position="left" :model="searchParams" :label-width="80" inline>
       <FormItem label="模板名称" prop="templatename">
         <Input clearable type="text" v-model="searchParams.templatename" placeholder="请输入模板名称">
         </Input>
@@ -13,7 +13,7 @@
         <Button icon="ios-search" :loading="loading" type="primary" @click="onSearch">查询</Button>
       </FormItem>
     </Form>
-    <Table :columns="columns" :loading="loading" size="small" :data="list"></Table>
+    <Table :columns="columns" stripe :loading="loading" size="small" :data="list"></Table>
     <Divider />
     <Page @on-change="pageChange" :page-size="10" :total="total" />
   </div>
@@ -36,6 +36,11 @@ export default {
       total: 0,
       loading: false,
       columns: [
+        {
+          title: '序号',
+          width: 50,
+          type: 'index'
+        },
         {
           title: '模板名称',
           key: 'templatename'
