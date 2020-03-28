@@ -1,5 +1,5 @@
 <template>
-  <div class="editor">
+  <div data-step="4" data-intro="查看生成代码是否正确！" class="editor">
     <textarea ref="mycode" v-model="code"></textarea>
   </div>
 </template>

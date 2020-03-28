@@ -1,8 +1,8 @@
 <template>
   <div class="navigator">
-    <Button icon="ios-folder-open" @click="handleOpenPDM" type="primary">打开PDM</Button>
+    <Button data-step="1" data-intro="点击此按钮选择对应的pdm文件！" icon="ios-folder-open" @click="handleOpenPDM" type="primary">打开PDM</Button>
     <Dropdown @on-click="handleTemplateClick" transfer-class-name="expand-container">
-      <Button type="primary">
+      <Button data-step="3" data-intro="选择对应的模板，点击生成！" type="primary">
         请选择对应模板
         <Icon type="ios-arrow-down"></Icon>
       </Button>
@@ -12,9 +12,9 @@
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-    <Button icon="md-copy" @click="handleCopy" type="primary">复制到粘贴板</Button>
-    <Button icon="ios-share-alt" @click="handleExport" type="primary">导出代码</Button>
-    <Button icon="ios-albums" @click="handleTemplate" type="primary">模板管理</Button>
+    <Button data-step="4" data-intro="点击复制粘贴按钮则代码自动复制到粘贴板！" icon="md-copy" @click="handleCopy" type="primary">复制到粘贴板</Button>
+    <Button data-step="5" data-intro="自动将代码导出到文件！" icon="ios-share-alt" @click="handleExport" type="primary">导出代码</Button>
+    <Button data-step="6" data-intro="点击模板管理可以管理本地模板及下载共享模板！" icon="ios-albums" @click="handleTemplate" type="primary">模板管理</Button>
     <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input>
     <Modal v-model="modal" fullscreen footer-hide title="模板管理">
       <Tabs value="name1">
@@ -63,7 +63,7 @@
       </Tabs>
     </Modal>
     <div @click="login" class="login-container">
-      <Avatar shape="square" :src="getCurrentUser.avatar" icon="ios-person" />
+      <Avatar data-step="9" data-intro="软件登录及注册！" shape="square" :src="getCurrentUser.avatar" icon="ios-person" />
     </div>
     <Modal v-model="loginModal" footer-hide title="登录">
       <Tabs type="card">

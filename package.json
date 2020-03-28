@@ -23,6 +23,7 @@
     "core-js": "^2.6.5",
     "electron-json-storage": "^4.1.7",
     "getmac": "^5.1.0",
+    "intro.js": "^2.9.3",
     "js-beautify": "^1.10.2",
     "lodash": "^4.17.15",
     "view-design": "^4.1.3",
