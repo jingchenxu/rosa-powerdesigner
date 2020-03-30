@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, protocol, BrowserWindow, ipcMain, Menu } from 'electron'
+import { autoUpdater } from 'electron-updater'
 import {
   createProtocol
   // installVueDevtools
@@ -194,6 +195,19 @@ ipcMain.on('app-init', function (event, sign) {
     }
   })
 
+  // 判断应用是否为第一次打开
+  var cmd = process.argv[1]
+
+  if (cmd === '--squirrel-firstrun') {
+    // Running for the first time.
+    console.log('应用为第一次打开')
+    // 这里发出消息要开始引导
+    win.webContents.send('startGuide')
+  }
+
+  // 应用更新
+  updateHandle()
+
   // 代码导出
   ipcMain.on('code-export', function (event, file) {
     console.log('FIXME 文件保存, 如果没有日志，这里会抖动')
@@ -240,3 +254,54 @@ ipcMain.on('githubLogin', function (event) {
     login = null
   })
 })
+
+// 通过main进程发送事件给renderer进程，提示更新信息
+function sendUpdateMessage (text) {
+  win.webContents.send('message', text)
+}
+
+// 关于自动更新相关的代码
+function updateHandle () {
+  let uploadUrl = 'https://github.com/jingchenxu/rosa-powerdesigner/releases'
+
+  let message = {
+    error: '检查更新出错',
+    checking: '正在检查更新……',
+    updateAva: '检测到新版本，正在下载……',
+    updateNotAva: '现在使用的就是最新版本，不用更新'
+  }
+
+  autoUpdater.setFeedURL(uploadUrl)
+  autoUpdater.on('error', () => {
+    sendUpdateMessage(message.error)
+  })
+  autoUpdater.on('checking-for-update', () => {
+    sendUpdateMessage(message.checking)
+  })
+  autoUpdater.on('update-available', () => {
+    sendUpdateMessage(message.updateAva)
+  })
+  autoUpdater.on('update-not-available', () => {
+    sendUpdateMessage(message.updateNotAva)
+  })
+
+  // 更新下载进度事件
+  autoUpdater.on('download-progress', function (progressObj) {
+    win.webContents.send('downloadProgress', progressObj)
+  })
+  autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {
+    ipcMain.on('isUpdateNow', (e, arg) => {
+      console.log(arguments)
+      console.log('开始更新')
+      // some code here to handle event
+      autoUpdater.quitAndInstall()
+    })
+
+    win.webContents.send('isUpdateNow')
+  })
+
+  ipcMain.on('checkForUpdate', () => {
+    // 执行自动更新检查
+    autoUpdater.checkForUpdates()
+  })
+}

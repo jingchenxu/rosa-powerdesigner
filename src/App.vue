@@ -110,11 +110,20 @@ export default {
     ipcRenderer.on('updateAppConfig', (event, appConfig) => {
       this.$store.dispatch('UPDATEAPPCONFIG', appConfig)
     })
+    ipcRenderer.on('isUpdateNow', () => {
+      console.log('监听到了更新请求')
+    })
     let currentUser = handleLocalStorage('get', 'currentUser')
     if (currentUser) {
       this.$store.dispatch('UPDATECURRENTUSER', JSON.parse(currentUser))
     }
-    this.firstIntro()
+    ipcRenderer.on('startGuide', () => {
+      this.firstIntro()
+    })
+    ipcRenderer.on('message', (event, message) => {
+      this.$Message.info(message)
+    })
+    ipcRenderer.send('checkForUpdate')
   },
   methods: {
     updateAppSetting () {

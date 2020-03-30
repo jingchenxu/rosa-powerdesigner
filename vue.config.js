@@ -1,3 +1,7 @@
+const pjson = require('./package.json')
+
+const { name, version } = { ...pjson }
+
 module.exports = {
   css: {
     loaderOptions: {
@@ -35,6 +39,14 @@ module.exports = {
         productName: 'Rosa',
         appId: 'com.deepwater.rosa',
         copyright: 'jingchenxu2015@gmail.com',
+        publish: [
+          {
+            provider: 'github',
+            owner: 'jingchenxu2015@gmail.com',
+            repo: 'rosa-powerdesigner',
+            url: 'https://github.com/jingchenxu/rosa-powerdesigner/releases'
+          }
+        ],
         directories: {
           output: 'build'
         },
@@ -50,7 +62,9 @@ module.exports = {
           shortcutName: 'rosa'
         },
         win: {
-          icon: 'public/icon.ico',
+          icon: 'public/Rosa.ico',
+          // eslint-disable-next-line no-undef
+          artifactName: `${name}_setup_${version}.exe`,
           target: [
             {
               target: 'nsis'
