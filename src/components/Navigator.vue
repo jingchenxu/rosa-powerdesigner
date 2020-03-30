@@ -15,7 +15,7 @@
     <Button data-step="4" data-intro="点击复制粘贴按钮则代码自动复制到粘贴板！" icon="md-copy" @click="handleCopy" type="primary">复制到粘贴板</Button>
     <Button data-step="5" data-intro="自动将代码导出到文件！" icon="ios-share-alt" @click="handleExport" type="primary">导出代码</Button>
     <Button data-step="6" data-intro="点击模板管理可以管理本地模板及下载共享模板！" icon="ios-albums" @click="handleTemplate" type="primary">模板管理</Button>
-    <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input>
+    <!-- <Input style="width: auto;" @on-enter="handleSearch" @on-clear="handleSearch" v-model="searchStr" clearable placeholder="请输入查询条件"></Input> -->
     <Modal v-model="modal" fullscreen footer-hide title="模板管理">
       <Tabs value="name1">
         <TabPane label="本地模板" name="name1">
@@ -148,7 +148,8 @@ export default {
       columns1: [
         {
           title: '序号',
-          width: 50,
+          width: 60,
+          align: 'center',
           type: 'index'
         },
         {
@@ -266,9 +267,16 @@ export default {
       }
     },
     handleExport () {
+      if (this.getActiveTemplate === {}) {
+        this.$Message.warning('请选择代码模板')
+        return
+      }
       const { fileextension } = { ...this.getActiveTemplate }
+      const { tablecode } = { ...this.getCurrentTable }
+      let defaultFileName = `${tablecode}.${fileextension}`
       this.$Modal.confirm({
         render: (h) => {
+          this.value = defaultFileName
           return h('Input', {
             props: {
               value: this.value,
@@ -293,6 +301,10 @@ export default {
       })
     },
     handleCopy () {
+      if (this.getActiveTemplate === {}) {
+        this.$Message.warning('请选择代码模板')
+        return
+      }
       clipboard.writeText(this.genCode())
       this.$Message.info('复制成功')
     },

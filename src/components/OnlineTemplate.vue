@@ -38,7 +38,8 @@ export default {
       columns: [
         {
           title: '序号',
-          width: 50,
+          width: 60,
+          align: 'center',
           type: 'index'
         },
         {

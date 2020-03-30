@@ -1,5 +1,6 @@
 <template>
   <div class="table-setting">
+    <Alert type="warning">当前修改仅本次代码生成有效，并不会永久保存修改！</Alert>
     <Table :columns="column" stripe size="small" :data="getCurrentTable.columns" :height="400"></Table>
   </div>
 </template>
@@ -67,20 +68,20 @@ export default {
           key: 'ismainkey',
           render: (h, params) => {
             const { index, row } = { ...params }
-            let input = h('i-input', {
+            let input = h('i-switch', {
               props: {
-                value: row.ismainkey
+                value: row.ismainkey,
+                disabled: !row.canedit
               },
               on: {
                 'on-change': (e) => {
                   let currentTable = this.getCurrentTable
-                  currentTable.columns[index].ismainkey = e.target.value
+                  currentTable.columns[index].ismainkey = e
                   this.$store.dispatch('UPDATECURRENTTABLE', currentTable)
                 }
               }
             })
-            let text = h('span', row.ismainkey)
-            return row.canedit ? input : text
+            return input
           }
         },
         {

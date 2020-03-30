@@ -79,14 +79,6 @@ import 'codemirror/mode/sql/sql'
 
 import { mapGetters } from 'vuex'
 
-import Vue from 'vue'
-const beautifyJs = require('js-beautify').js_beautify
-
-const jdFormatConfig = {
-  indent_size: 2,
-  end_with_newline: true
-}
-
 export default {
   name: 'Editor',
   data () {
