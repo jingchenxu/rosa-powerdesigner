@@ -49,7 +49,7 @@
     </Modal>
     <foo-modal name="downloadProgress" transition="scale" :height="260" :width="260" classes="download-progress">
       <span>下载进度</span>
-        <i-circle :size="260" :percent="percent">
+        <i-circle stroke-color="#ed7b7b" :size="260" :percent="percent">
         <span class="demo-Circle-inner" style="font-size:24px">{{percent | fixTwoPoint}}%</span>
         </i-circle>
     </foo-modal>
@@ -237,7 +237,7 @@ body {
   .ivu-layout {
     .ivu-layout-header {
       height: 50px;
-      background-color: #dadada;
+      background-color: @tiny-bg;
       padding: 0;
     }
     .ivu-layout-sider {
@@ -247,7 +247,7 @@ body {
     }
     .ivu-layout-footer {
       height: 36px;
-      background-color: #dadada;
+      background-color: @tiny-bg;
       line-height: 36px;
       padding: 0 10px;
       .setting-container {

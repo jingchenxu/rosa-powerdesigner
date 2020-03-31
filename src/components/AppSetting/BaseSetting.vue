@@ -1,7 +1,7 @@
 <template>
   <Form ref="appConfig" :model="appConfig" :rules="appRule" :label-width="100">
     <FormItem label="编辑器主题" prop="editorTheme">
-      <Select @on-change="editorThemeChange" value="getEditorTheme">
+      <Select @on-change="editorThemeChange" :value="appConfig.getEditorTheme">
         <Option v-for="editorTheme in editorThemes" :value="editorTheme" :key="editorTheme">{{ editorTheme }}</Option>
       </Select>
     </FormItem>
@@ -19,6 +19,14 @@ export default {
   name,
   computed: {
     ...mapGetters(['getAppConfig', 'getEditorTheme'])
+  },
+  watch: {
+    getEditorTheme: {
+      handler (editorTheme) {
+        this.appConfig.editorTheme = editorTheme
+      },
+      immediate: true
+    }
   },
   data () {
     return {
