@@ -11,7 +11,7 @@
 
 **warning**: 目前对于powerdesign16.0及powerdesign16.5生成的PDM文件的解析是没有问题的，对于其他版本的PDM解析如果存在问题，请在issues当中提出，最好提供PDM文件。
 
-## 如何使用
+## ⌨️ 如何使用
 
 ``` bash
 # 拉取源码
