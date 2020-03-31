@@ -29,17 +29,16 @@ yarn run electron:serve
 yarn run electron:build
 ```
 
-## Features ([CHANGELOG](CHANGELOG.md))
+## ✨ Features ([CHANGELOG](CHANGELOG.md))
 
-- 支持生成ES6语法的类；
-- 支持生成iview Table 组件所使用的表头；
-- 支持生成iview Form 组件所使用的校验文件；
-- 支持生成iview 表单组件；
+- 支持解析pdm文件;
+- 支持本地模板及在线模板，代码根据模板生成；
+- 支持文件导出及代码复制至粘贴板。
 
 #### [下载APP](https://github.com/jingchenxu/rosa-powerdesigner/releases)
 
-#### License [MIT](LICENSE.md)
+## 🛠 技术栈
 
+- [Electron](https://electronjs.org/)
+- [Vue](https://vuejs.org/) + [VueX](https://vuex.vuejs.org/) + [Element](https://element.eleme.io)
 
-https://gitee.com/hzhh123/electron-demo1
-https://segmentfault.com/a/1190000012904543
