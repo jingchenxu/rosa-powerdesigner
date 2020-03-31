@@ -39,3 +39,7 @@ yarn run electron:build
 #### [下载APP](https://github.com/jingchenxu/rosa-powerdesigner/releases)
 
 #### License [MIT](LICENSE.md)
+
+
+https://gitee.com/hzhh123/electron-demo1
+https://segmentfault.com/a/1190000012904543

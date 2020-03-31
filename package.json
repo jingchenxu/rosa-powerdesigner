@@ -2,7 +2,7 @@
   "name": "rosa-powerdesigner",
   "author": "jingchenxu2015@gmail.com",
   "description": "code generator for powerdesigner",
-  "version": "2.1.1",
+  "version": "2.1.3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -22,6 +22,7 @@
     "codemirror": "^5.52.2",
     "core-js": "^2.6.5",
     "electron-json-storage": "^4.1.7",
+    "electron-log": "^4.1.1",
     "electron-updater": "^4.2.5",
     "getmac": "^5.1.0",
     "intro.js": "^2.9.3",
@@ -29,6 +30,7 @@
     "lodash": "^4.17.15",
     "view-design": "^4.1.3",
     "vue": "^2.6.10",
+    "vue-js-modal": "^1.3.33",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1",
     "xml2js": "^0.4.19"

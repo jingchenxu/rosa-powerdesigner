@@ -13,6 +13,9 @@ const path = require('path')
 const storage = require('electron-json-storage')
 const os = require('os')
 const getMAC = require('getmac').default
+var log = require('electron-log')
+log.transports.console.level = false
+log.transports.console.level = 'silly'
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 storage.setDataPath(os.tmpdir())
@@ -50,6 +53,8 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.webContents.openDevTools()
 
   win.once('ready-to-show', () => {
     win.show()
@@ -262,7 +267,13 @@ function sendUpdateMessage (text) {
 
 // 关于自动更新相关的代码
 function updateHandle () {
-  let uploadUrl = 'https://github.com/jingchenxu/rosa-powerdesigner/releases'
+  // 清除每次下载更新的文件
+  // let updaterCacheDirName = 'electron-updater'
+  // const updatePendingPath = path.join(autoUpdater.app.baseCachePath, updaterCacheDirName, 'pending')
+  // log.warn(updatePendingPath)
+  // fs.emptyDir(updatePendingPath)
+  // log.warn(autoUpdater.app.baseCachePath)
+  let uploadUrl = 'http://www.deepwater.tech/codekeep/file/image'
 
   let message = {
     error: '检查更新出错',
@@ -270,23 +281,35 @@ function updateHandle () {
     updateAva: '检测到新版本，正在下载……',
     updateNotAva: '现在使用的就是最新版本，不用更新'
   }
-
+  // 设置是否自动下载，默认是true,当点击检测到新版本时，会自动下载安装包，所以设置为false
+  autoUpdater.autoDownload = true
+  autoUpdater.logger = log
+  // https://github.com/electron-userland/electron-builder/issues/1254
+  if (process.env.NODE_ENV === 'development') {
+    autoUpdater.updateConfigPath = path.join(__dirname, 'default-app-update.yml')
+  }
   autoUpdater.setFeedURL(uploadUrl)
-  autoUpdater.on('error', () => {
+  autoUpdater.on('error', (error) => {
+    if (error) {
+      throw error
+    }
     sendUpdateMessage(message.error)
   })
   autoUpdater.on('checking-for-update', () => {
     sendUpdateMessage(message.checking)
   })
-  autoUpdater.on('update-available', () => {
+  autoUpdater.on('update-available', (info) => {
+    console.log('执行到这里')
     sendUpdateMessage(message.updateAva)
   })
-  autoUpdater.on('update-not-available', () => {
+  autoUpdater.on('update-not-available', (info) => {
+    console.log('看看有没有执行到这里')
     sendUpdateMessage(message.updateNotAva)
   })
 
   // 更新下载进度事件
   autoUpdater.on('download-progress', function (progressObj) {
+    console.dir(progressObj)
     win.webContents.send('downloadProgress', progressObj)
   })
   autoUpdater.on('update-downloaded', function (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) {

@@ -47,6 +47,12 @@
     <Modal :width="800" footer-hide v-model="showTableSetting" :title="modalTitle">
       <table-setting />
     </Modal>
+    <foo-modal name="downloadProgress" transition="scale" :height="260" :width="260" classes="download-progress">
+      <span>下载进度</span>
+        <i-circle :size="260" :percent="percent">
+        <span class="demo-Circle-inner" style="font-size:24px">{{percent | fixTwoPoint}}%</span>
+        </i-circle>
+    </foo-modal>
   </div>
 </template>
 
@@ -68,6 +74,11 @@ export default {
       return `${this.getCurrentTable.tablecode}(${this.getCurrentTable.tablename})`
     }
   },
+  filters: {
+    fixTwoPoint (value) {
+      return value.toFixed(2)
+    }
+  },
   components: {
     Navigator,
     TableMenu,
@@ -81,7 +92,8 @@ export default {
       formValidate: {},
       ruleValidate: {},
       showTableSetting: false,
-      split: 0.2
+      split: 0.2,
+      percent: 0
     }
   },
   beforeCreate () {
@@ -112,6 +124,25 @@ export default {
     })
     ipcRenderer.on('isUpdateNow', () => {
       console.log('监听到了更新请求')
+      // 弹出弹框判断是否要更新
+      this.$Modal.confirm({
+        title: '确认是否更新',
+        content: '请确认是否更新',
+        onOk: () => {
+          ipcRenderer.send('isUpdateNow')
+        },
+        onCancel: () => {
+          this.$Message.info('Clicked cancel')
+        }
+      })
+    })
+    ipcRenderer.on('downloadProgress', (event, progressObj) => {
+      console.dir(progressObj)
+      this.percent = progressObj.percent
+      this.$modal.show('downloadProgress')
+      if (!this.showProgress) {
+        this.showProgress = true
+      }
     })
     let currentUser = handleLocalStorage('get', 'currentUser')
     if (currentUser) {
@@ -236,4 +267,9 @@ body {
   }
 }
 @import "./views/global.less";
+.download-progress {
+    background-color: transparent;
+    border-radius: 100%;
+    box-shadow: 0 2px 20px 0 rgba(0, 0, 0, 0.4);
+}
 </style>
