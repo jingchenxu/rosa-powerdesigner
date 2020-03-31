@@ -44,7 +44,8 @@ module.exports = {
             provider: 'github',
             owner: 'jingchenxu2015@gmail.com',
             repo: 'rosa-powerdesigner',
-            url: 'https://github.com/jingchenxu/rosa-powerdesigner/releases'
+            // token: '',
+            url: 'http://www.deepwater.tech/codekeep/file/image'
           }
         ],
         directories: {
