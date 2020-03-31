@@ -54,8 +54,6 @@ function createWindow () {
     win.loadURL('app://./index.html')
   }
 
-  win.webContents.openDevTools()
-
   win.once('ready-to-show', () => {
     win.show()
   })
