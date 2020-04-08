@@ -271,7 +271,7 @@ function updateHandle () {
   // log.warn(updatePendingPath)
   // fs.emptyDir(updatePendingPath)
   // log.warn(autoUpdater.app.baseCachePath)
-  let uploadUrl = 'http://www.deepwater.tech/codekeep/file/image'
+  let uploadUrl = 'https://rosa.deepwater.tech/release'
 
   let message = {
     error: '检查更新出错',
